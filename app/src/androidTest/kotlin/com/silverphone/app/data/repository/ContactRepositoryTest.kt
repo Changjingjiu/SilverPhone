@@ -137,6 +137,40 @@ class ContactRepositoryTest {
         assertNotNull(repository.photoBytes(remaining[0].id))
     }
 
+    /**
+     * The bulk delete behind the management screen's multi-select.
+     *
+     * It has to behave like several single deletes at once: the photos go with the
+     * contacts, the stored order is compacted once, everything the family member did
+     * not tick survives, and an all-or-nothing transaction means a failure cannot leave
+     * a partial selection deleted.
+     */
+    @Test
+    fun deletingSeveralContactsAtOnceRemovesTheirPhotosAndKeepsTheRest() = runTest {
+        repository.addContact("一", "10000000001", PlaceholderColor.DEFAULT, photo(1))
+        repository.addContact("二", "10000000002", PlaceholderColor.DEFAULT, photo(2))
+        repository.addContact("三", "10000000003", PlaceholderColor.DEFAULT, photo(3))
+        repository.addContact("四", "10000000004", PlaceholderColor.DEFAULT, null)
+
+        val all = repository.snapshot().contacts
+        val doomed = listOf(all[0].id, all[2].id)
+        assertTrue(repository.deleteContacts(doomed) is ContactWriteResult.Success)
+
+        val remaining = repository.snapshot().contacts
+        assertEquals(listOf("二", "四"), remaining.map { it.displayName })
+        assertEquals(listOf(0, 1), remaining.map { it.sortOrder })
+        doomed.forEach { id -> assertNull(repository.photoBytes(id)) }
+        // The survivors keep their photos.
+        assertNotNull(repository.photoBytes(remaining[0].id))
+    }
+
+    @Test
+    fun deletingNothingAtAllIsRefusedRatherThanSucceedingSilently() = runTest {
+        repository.addContact("一", "10000000001", PlaceholderColor.DEFAULT, null)
+        assertTrue(repository.deleteContacts(emptyList()) is ContactWriteResult.NotFound)
+        assertEquals(1, repository.snapshot().contacts.size)
+    }
+
     @Test
     fun editingWithoutTouchingThePhotoKeepsTheStoredBytes() = runTest {
         repository.addContact("女儿", "13800138000", PlaceholderColor.DEFAULT, photo(5))

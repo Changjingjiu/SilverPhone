@@ -32,6 +32,10 @@
 - **四档字号**，作用于整个应用，保存前有真实卡片预览。
 - **中英文界面**，区号可以设成任何国家。
 - **一个文件把亲人搬到第二台手机**：称呼、号码、顺序、照片都在里面，接收方可以先预览再导入。
+- **长按亲人卡片可以多选删除**，删之前会告诉你要删掉几位。
+- **一台手机里其实是两套界面。** 拨号首页围绕老人来做；所有家属页面就是普通 Android 应用的样子：紧凑的标题栏、一行的列表项、没有占半屏的大按钮。
+- **跟着屏幕大小走。** 手机上一个页面一个页面地开；平板和折叠屏上，菜单常驻在左边，选中的页面显示在右边（用的是 Material 3 的 `ListDetailPaneScaffold` 和窗口尺寸档位，不靠机型判断）。
+- **每次按下都有回应**：控件会变深、缩小、回弹，并给一次轻微的触感。
 - **没有账号、没有广告、没有统计。** 应用里唯一联网的地方是手动点「检查更新」。
 
 ## 如何开始
@@ -87,7 +91,7 @@
 | 系统要求 | Android 6.0+（API 23），不需要 Google 服务，不需要账号 |
 | 权限 | `CALL_PHONE`、`READ_CONTACTS`（都在用到的那一刻申请）、`INTERNET`（只用于手动检查更新） |
 | 构建 | JDK 17 和 Android SDK 36；`./gradlew assembleDebug` |
-| 测试 | `./gradlew testDebugUnitTest`（104 个）· `./gradlew connectedDebugAndroidTest`（51 个） |
+| 测试 | `./gradlew testDebugUnitTest`（104 个）· `./gradlew connectedDebugAndroidTest`（57 个） |
 | 文档 | [docs/spec](docs/spec) 四份设计文档 · [IMPLEMENTATION-NOTES.md](IMPLEMENTATION-NOTES.md) · [acceptance-results.md](acceptance-results.md) · [build-matrix.md](build-matrix.md) · [docs/RELEASING.md](docs/RELEASING.md) · [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) |
 
 **故意不做的**：账号、同步、服务器、云备份、统计、广告、崩溃上报；上架应用商店；视频通话；消息；多用户档案；通话记录；拨号盘；从锁屏拨号。

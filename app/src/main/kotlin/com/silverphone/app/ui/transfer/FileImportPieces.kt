@@ -1,9 +1,12 @@
 package com.silverphone.app.ui.transfer
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,15 +19,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,8 +52,14 @@ import com.silverphone.app.R
 import com.silverphone.app.domain.ImportCommitResult
 import com.silverphone.app.domain.ImportedContact
 import com.silverphone.app.platform.transfer.BackupReader
+import com.silverphone.app.ui.components.PRESSED_SCALE_GENTLE
 import com.silverphone.app.ui.components.PlaceholderAvatar
-import com.silverphone.app.ui.components.PrimaryActionButton
+import com.silverphone.app.ui.components.PressHaptics
+import com.silverphone.app.ui.components.FilledActionButton
+import com.silverphone.app.ui.components.StatusCard
+import com.silverphone.app.ui.components.StatusTone
+import com.silverphone.app.ui.components.pressScale
+import com.silverphone.app.ui.components.rememberPressFeedback
 import com.silverphone.app.ui.theme.AppColors
 import com.silverphone.app.ui.theme.LocalAppDimens
 import com.silverphone.app.ui.theme.LocalAppTextStyles
@@ -74,7 +89,7 @@ internal fun IdleBody(onChoose: () -> Unit) {
             style = styles.body,
             color = AppColors.TextSecondary,
         )
-        PrimaryActionButton(
+        FilledActionButton(
             text = stringResource(R.string.import_choose),
             icon = Icons.Filled.Refresh,
             onClick = onChoose,
@@ -126,13 +141,13 @@ internal fun RejectedBody(reason: BackupReader.Reason, onChooseAgain: () -> Unit
             .padding(top = dimens.touchGap),
         verticalArrangement = Arrangement.spacedBy(dimens.touchGap),
     ) {
-        Text(text = message, style = styles.body, color = AppColors.DangerRed)
+        StatusCard(text = message, tone = StatusTone.DANGER, icon = Icons.Filled.Warning)
         Text(
             text = stringResource(R.string.import_rejected_hint),
-            style = styles.caption,
+            style = styles.body,
             color = AppColors.TextSecondary,
         )
-        PrimaryActionButton(
+        FilledActionButton(
             text = stringResource(R.string.import_choose),
             icon = Icons.Filled.Refresh,
             onClick = onChooseAgain,
@@ -150,6 +165,7 @@ internal fun FileEntryRow(contact: ImportedContact) {
             .fillMaxWidth()
             .clip(RoundedCornerShape(dimens.cardCorner))
             .background(AppColors.Surface)
+            .border(1.dp, AppColors.Hairline, RoundedCornerShape(dimens.cardCorner))
             .padding(dimens.cardInnerPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -163,7 +179,7 @@ internal fun FileEntryRow(contact: ImportedContact) {
         Box(
             modifier = Modifier
                 .size(THUMB)
-                .clip(RoundedCornerShape(10.dp)),
+                .clip(RoundedCornerShape(dimens.photoCorner)),
         ) {
             if (bitmap != null) {
                 Image(
@@ -181,7 +197,7 @@ internal fun FileEntryRow(contact: ImportedContact) {
         }
         Spacer(Modifier.width(dimens.cardInnerPadding))
         Column {
-            Text(text = contact.displayName, style = styles.body, color = AppColors.TextPrimary)
+            Text(text = contact.displayName, style = styles.button, color = AppColors.TextPrimary)
             Text(text = contact.phoneNumber, style = styles.caption, color = AppColors.TextSecondary)
         }
     }
@@ -196,21 +212,40 @@ internal fun ModeOption(
 ) {
     val dimens = LocalAppDimens.current
     val styles = LocalAppTextStyles.current
+    val accent = if (danger) AppColors.DangerRed else AppColors.Ink
+    val shape = RoundedCornerShape(dimens.cardCorner)
+
+    val interactionSource = remember { MutableInteractionSource() }
+    val press = rememberPressFeedback(interactionSource, pressedScale = PRESSED_SCALE_GENTLE)
+    PressHaptics(interactionSource)
+    val fill by animateColorAsState(
+        targetValue = when {
+            press.pressed -> AppColors.SurfacePressed
+            selected && danger -> AppColors.DangerSoft
+            selected -> AppColors.InkSoft
+            else -> AppColors.Surface
+        },
+        animationSpec = tween(90),
+        label = "modeFill",
+    )
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(dimens.cardCorner))
-            .background(AppColors.Surface)
+            .pressScale(press.scale)
+            .clip(shape)
+            .background(fill)
             .border(
-                width = if (selected) 3.dp else 1.dp,
-                color = when {
-                    selected && danger -> AppColors.DangerRed
-                    selected -> AppColors.Focus
-                    else -> AppColors.Outline
-                },
-                shape = RoundedCornerShape(dimens.cardCorner),
+                width = if (selected) 2.dp else 1.dp,
+                color = if (selected) accent else AppColors.Hairline,
+                shape = shape,
             )
-            .clickable(onClick = onClick)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = ripple(color = accent),
+                role = Role.RadioButton,
+                onClick = onClick,
+            )
             // Selection was signalled only by a border width, which a screen reader
             // cannot convey and a low-vision user can easily miss.
             .clearAndSetSemantics {
@@ -226,10 +261,35 @@ internal fun ModeOption(
             .padding(dimens.cardInnerPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        Box(
+            modifier = Modifier
+                .size(dimens.secondaryGlyph)
+                .clip(CircleShape)
+                .then(
+                    if (selected) {
+                        Modifier.background(accent)
+                    } else {
+                        Modifier.border(2.dp, AppColors.Outline, CircleShape)
+                    },
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (selected) {
+                Icon(
+                    imageVector = Icons.Filled.Check,
+                    contentDescription = null,
+                    tint = AppColors.Surface,
+                    modifier = Modifier
+                        .size(20.dp)
+                        .clearAndSetSemantics { },
+                )
+            }
+        }
         Text(
             text = label,
             style = styles.body,
             color = if (danger) AppColors.DangerRed else AppColors.TextPrimary,
+            modifier = Modifier.padding(start = dimens.cardInnerPadding),
         )
     }
 }
@@ -268,10 +328,10 @@ internal fun DoneBody(result: ImportCommitResult) {
             .fillMaxSize()
             .padding(top = dimens.touchGap),
     ) {
-        Text(
+        StatusCard(
             text = message,
-            style = styles.body,
-            color = if (danger) AppColors.DangerRed else AppColors.TextPrimary,
+            tone = if (danger) StatusTone.DANGER else StatusTone.GOOD,
+            icon = if (danger) Icons.Filled.Warning else Icons.Filled.Check,
         )
     }
 }

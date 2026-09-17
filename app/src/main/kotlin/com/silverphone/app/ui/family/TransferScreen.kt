@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Text
@@ -22,7 +21,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.silverphone.app.R
-import com.silverphone.app.ui.components.BackActionButton
+import com.silverphone.app.ui.components.FamilyScreen
 import com.silverphone.app.ui.components.SettingsEntry
 import com.silverphone.app.ui.theme.AppColors
 import com.silverphone.app.ui.theme.LocalAppDimens
@@ -48,34 +47,14 @@ fun TransferScreen(
     modifier: Modifier = Modifier,
 ) {
     val dimens = LocalAppDimens.current
-    val styles = LocalAppTextStyles.current
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(AppColors.Background)
-            .windowInsetsPadding(WindowInsets.safeDrawing),
+    FamilyScreen(
+        title = stringResource(R.string.transfer_title),
+        subtitle = stringResource(R.string.transfer_subtitle),
+        onBack = onBack,
+        backLabel = stringResource(R.string.action_back),
+        modifier = modifier.fillMaxSize(),
     ) {
-        Text(
-            text = stringResource(R.string.transfer_title),
-            style = styles.pageTitle,
-            color = AppColors.TextPrimary,
-            modifier = Modifier.padding(
-                start = dimens.pagePadding,
-                end = dimens.pagePadding,
-                top = dimens.pagePadding,
-            ),
-        )
-        Text(
-            text = stringResource(R.string.transfer_subtitle),
-            style = styles.caption,
-            color = AppColors.TextSecondary,
-            modifier = Modifier.padding(
-                start = dimens.pagePadding,
-                end = dimens.pagePadding,
-                top = 4.dp,
-            ),
-        )
 
         LazyColumn(
             modifier = Modifier.weight(1f),
@@ -105,13 +84,5 @@ fun TransferScreen(
             }
         }
 
-        BackActionButton(
-            text = stringResource(R.string.action_back),
-            icon = Icons.Filled.Info,
-            onClick = onBack,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimens.pagePadding),
-        )
     }
 }

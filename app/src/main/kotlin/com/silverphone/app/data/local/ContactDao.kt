@@ -96,6 +96,9 @@ interface ContactDao {
     @Query("DELETE FROM contacts WHERE id = :id")
     suspend fun deleteById(id: String)
 
+    @Query("DELETE FROM contacts WHERE id IN (:ids)")
+    suspend fun deleteByIds(ids: List<String>)
+
     @Query("DELETE FROM contacts")
     suspend fun deleteAll()
 }

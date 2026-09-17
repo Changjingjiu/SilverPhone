@@ -4,6 +4,12 @@
       Semantic palette from the UI spec. Pages must reference these names, not
       ad-hoc approximations, so the fixed high-contrast light theme stays stable.
     -->
+    <!--
+      The launcher icon's background only. It is deliberately not referenced from
+      values/ or drawable/ inside the interface: the owner asked for the fluorescent
+      colour to be taken out of the app, and the icon is the one place it still means
+      something. See AppColors.BrandLime.
+    -->
     <color name="brand_lime">#D6FF00</color>
     <color name="ink">#172554</color>
     <color name="background">#F7F8FA</color>

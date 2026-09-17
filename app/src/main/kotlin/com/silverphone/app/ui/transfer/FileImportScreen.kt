@@ -26,10 +26,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -51,10 +50,12 @@ import com.silverphone.app.R
 import com.silverphone.app.domain.ImportCommitResult
 import com.silverphone.app.domain.ImportedContact
 import com.silverphone.app.platform.transfer.BackupReader
-import com.silverphone.app.ui.components.BackActionButton
-import com.silverphone.app.ui.components.DangerActionButton
+import com.silverphone.app.ui.components.FamilyScreen
+import com.silverphone.app.ui.components.FilledActionButton
 import com.silverphone.app.ui.components.PlaceholderAvatar
-import com.silverphone.app.ui.components.PrimaryActionButton
+import com.silverphone.app.ui.components.SectionCard
+import com.silverphone.app.ui.components.StatusCard
+import com.silverphone.app.ui.components.StatusTone
 import com.silverphone.app.ui.theme.AppColors
 import com.silverphone.app.ui.theme.LocalAppDimens
 import com.silverphone.app.ui.theme.LocalAppTextStyles
@@ -121,23 +122,18 @@ fun FileImportScreen(
         onFileChosen(uri)
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(AppColors.Background)
-            .windowInsetsPadding(WindowInsets.safeDrawing),
+    FamilyScreen(
+        title = stringResource(R.string.import_title),
+        subtitle = stringResource(R.string.settings_import_file_desc),
+        onBack = onBack,
+        backLabel = stringResource(R.string.action_back),
+        modifier = modifier.fillMaxSize(),
     ) {
         Column(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = dimens.pagePadding),
         ) {
-            Text(
-                text = stringResource(R.string.import_title),
-                style = styles.pageTitle,
-                color = AppColors.TextPrimary,
-                modifier = Modifier.padding(top = dimens.pagePadding),
-            )
 
             when (val stage = state.stage) {
                 FileImportStage.Idle -> IdleBody(
@@ -166,64 +162,69 @@ fun FileImportScreen(
             }
         }
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimens.pagePadding),
-            verticalArrangement = Arrangement.spacedBy(dimens.touchGap),
-        ) {
-            when (state.stage) {
-                is FileImportStage.Preview -> {
-                    if (state.committing) {
-                        Text(
-                            text = stringResource(R.string.import_commit),
-                            style = styles.caption,
-                            color = AppColors.TextSecondary,
-                        )
-                    }
+        when (state.stage) {
+            is FileImportStage.Preview -> Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = dimens.pagePadding, vertical = dimens.touchGap),
+            ) {
+                if (state.committing) {
+                    Text(
+                        text = stringResource(R.string.import_commit),
+                        style = styles.caption,
+                        color = AppColors.TextSecondary,
+                        modifier = Modifier.padding(bottom = dimens.spaceSnug),
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(dimens.touchGap),
+                ) {
                     if (state.mode == ImportMode.APPEND) {
-                        PrimaryActionButton(
+                        FilledActionButton(
                             text = stringResource(R.string.import_confirm_append),
                             icon = Icons.Filled.Check,
                             enabled = !state.committing &&
                                 state.stage.appendPlan.additions.isNotEmpty(),
                             onClick = onCommitAppend,
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.weight(1f),
                         )
                     } else {
-                        DangerActionButton(
+                        FilledActionButton(
                             text = stringResource(R.string.import_confirm_replace),
                             // A bin, not a refresh arrows glyph: this action deletes
                             // every current contact, and the same arrow glyph is used
                             // elsewhere for "choose a file".
                             icon = Icons.Filled.Delete,
+                            danger = true,
                             enabled = !state.committing,
                             onClick = onRequestReplace,
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.weight(1f),
                         )
                     }
-                    com.silverphone.app.ui.components.CancelActionButton(
+                    FilledActionButton(
                         text = stringResource(R.string.import_cancel),
-                        icon = Icons.Filled.Clear,
+                        emphasis = false,
                         onClick = onCancelPreview,
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.weight(1f),
                     )
                 }
+            }
 
-                is FileImportStage.Done -> PrimaryActionButton(
+            is FileImportStage.Done -> Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = dimens.pagePadding, vertical = dimens.touchGap),
+            ) {
+                FilledActionButton(
                     text = stringResource(R.string.action_confirm),
                     icon = Icons.Filled.Check,
                     onClick = onFinished,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-
-                else -> BackActionButton(
-                    text = stringResource(R.string.action_back),
-                    icon = Icons.Filled.Info,
-                    onClick = onBack,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.weight(1f),
                 )
             }
+
+            else -> Unit
         }
     }
 
@@ -271,30 +272,30 @@ private fun PreviewBody(
     ) {
         if (lastName != null) {
             item {
-                Text(
-                    text = stringResource(R.string.import_file_summary, lastName),
-                    style = styles.caption,
-                    color = AppColors.TextSecondary,
-                )
+                SectionCard {
+                    Column(verticalArrangement = Arrangement.spacedBy(dimens.spaceSnug)) {
+                        Text(
+                            text = stringResource(R.string.import_file_summary, lastName),
+                            style = styles.caption,
+                            color = AppColors.TextSecondary,
+                        )
+                        Text(
+                            text = stringResource(R.string.import_exported_at, ready.exportedAt),
+                            style = styles.caption,
+                            color = AppColors.TextSecondary,
+                        )
+                        Text(
+                            text = stringResource(
+                                R.string.import_counts,
+                                ready.contacts.size,
+                                ready.photoCount,
+                            ),
+                            style = styles.button,
+                            color = AppColors.TextPrimary,
+                        )
+                    }
+                }
             }
-        }
-        item {
-            Text(
-                text = stringResource(R.string.import_exported_at, ready.exportedAt),
-                style = styles.caption,
-                color = AppColors.TextSecondary,
-            )
-        }
-        item {
-            Text(
-                text = stringResource(
-                    R.string.import_counts,
-                    ready.contacts.size,
-                    ready.photoCount,
-                ),
-                style = styles.body,
-                color = AppColors.TextPrimary,
-            )
         }
 
         item {
@@ -315,34 +316,36 @@ private fun PreviewBody(
 
         if (mode == ImportMode.APPEND) {
             item {
-                Text(
-                    text = stringResource(
-                        R.string.import_append_plan,
-                        plan.additions.size,
-                        plan.existingCount,
-                        plan.skipped,
-                    ),
-                    style = styles.body,
-                    color = AppColors.TextPrimary,
-                )
-            }
-            item {
-                Text(
-                    text = stringResource(R.string.import_append_help),
-                    style = styles.caption,
-                    color = AppColors.TextSecondary,
-                )
+                SectionCard {
+                    Column(verticalArrangement = Arrangement.spacedBy(dimens.spaceSnug)) {
+                        Text(
+                            text = stringResource(
+                                R.string.import_append_plan,
+                                plan.additions.size,
+                                plan.existingCount,
+                                plan.skipped,
+                            ),
+                            style = styles.body,
+                            color = AppColors.TextPrimary,
+                        )
+                        Text(
+                            text = stringResource(R.string.import_append_help),
+                            style = styles.caption,
+                            color = AppColors.TextSecondary,
+                        )
+                    }
+                }
             }
         } else {
             item {
-                Text(
+                StatusCard(
                     text = stringResource(
                         R.string.import_replace_warning,
                         stage.replacePlan.existingCount,
                         stage.replacePlan.incoming.size,
                     ),
-                    style = styles.body,
-                    color = AppColors.DangerRed,
+                    tone = StatusTone.DANGER,
+                    icon = Icons.Filled.Warning,
                 )
             }
         }
@@ -358,8 +361,8 @@ private fun PreviewBody(
         item {
             Text(
                 text = stringResource(R.string.import_contacts_heading),
-                style = styles.body,
-                color = AppColors.TextPrimary,
+                style = styles.section,
+                color = AppColors.TextSecondary,
                 modifier = Modifier.padding(top = dimens.touchGap),
             )
         }
@@ -372,4 +375,3 @@ private fun PreviewBody(
         }
     }
 }
-

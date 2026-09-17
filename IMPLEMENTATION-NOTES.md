@@ -20,7 +20,7 @@ documents.
 
 | Source document said | Now | Why |
 |---|---|---|
-| 7.2 字号基准: page title 32 sp, contact name 26 sp, buttons 24 sp, body 22 sp, caption 18 sp at ratio 1.0 | **28 / 22 / 16 / 16 / 14 sp** | The owner's rule: the standard preset has to be the ordinary size a younger person reads, and the larger presets are what the family reaches for. The four ratios (1.0 / 1.2 / 1.4 / 1.6) are unchanged, so the largest preset is still much larger than the standard one. |
+| 7.2 字号基准: page title 32 sp, contact name 26 sp, buttons 24 sp, body 22 sp, caption 18 sp at ratio 1.0 | **20 / 16 / 14 / 14 / 12 sp** | Two rounds of the owner's review. The first round had set 28 / 22 / 16 / 16 / 14, and the owner then reported that the default still read as enlarged: a page whose every line is bigger than the rest of the phone is a crowded page. The standard preset is now the phone's own scale (Material's titleLarge, titleMedium, labelLarge, bodyMedium, bodySmall), and the three presets above it - 1.2 / 1.4 / 1.6 - are what the family reaches for. |
 | S01: a tap anywhere on a relative's card places the call | **Only the green button dials.** The photo and the name are inert. | Found on a real phone: the photo is the largest thing on a card, so a resting hand or a scroll that ended on a card could dial. The card is still one announcement; the photo is still how a person is recognised. |
 | S03: separate 从文件导入 and 导出亲人 entries | **One entry, 导入 / 导出**, with both actions on the screen behind it | Reading a file and writing one are two ends of the same job - one phone hands a ZIP to another - and two menu rows made the family choose a direction before knowing which one they needed. |
 | 拨号权限与使用说明 as the place to grant the call permission | The permission is **requested inline, at the moment of the press**; the help screen remains for the explanation and for the case where the system refuses | Owner's complaint: pressing Call and being sent to a help page to read where to tap, then tapping again, was the worst flow in the app. Granting it now places the call the user already asked for. |
@@ -28,6 +28,114 @@ documents.
 
 Everything else in the documents — the dialing rules, the archive protocol, the
 placeholder colours, the touch-target minimums, the call boundary — is unchanged.
+
+## The visual system (2026-09-18 revision)
+
+The owner reviewed the first build and called the interface ugly, dated and cramped,
+and asked for press feedback that can actually be seen. What follows is the system
+that replaced the first draft. The numbers are Material 3's published tokens rather
+than invented ones, so a reviewer can check them against the design system itself.
+
+| Layer | Value | Source |
+|---|---|---|
+| Card and list corner | 20 dp (`ShapeTokens.CornerLargeIncreased`) | Material 3 shape scale; the first draft used 16 dp |
+| Action buttons | Stadium (`RoundedCornerShape(percent = 50)`) | Material 3's default button shape |
+| Small row controls | 14 dp chip corner | Between the small (8 dp) and medium (12 dp) steps |
+| Elevation | 2 dp resting, 0 dp while held | Material 3 elevation level 1-2 |
+| Type | 20 / 16 / 14 / 14 / 12 sp | Material 3 titleLarge / titleMedium / labelLarge / bodyMedium / bodySmall |
+| Dial colour | `#15803D`, white label = 5.0:1 | The first draft's `#146C43` read as office-teal; the contrast floor the specification sets is 4.5:1 |
+| Brand accent | `#D6FF00` bar under each page title, and the launcher icon | The specification keeps the brand colour to small areas; inside the app that is one 44 x 4 dp rule per screen |
+
+### Press feedback
+
+A tap has to be acknowledged three times over, because the people using this app are
+the least likely to notice a subtle one. Every control that can be pressed now:
+
+- darkens to an explicit pressed fill (the Material button only tints by a few
+  percent, which is invisible on the dark fills this app uses);
+- shrinks to 96% under the finger and springs back on release with a small overshoot;
+- carries a ripple in the label's colour;
+- gives one short platform tick on the way down (`HapticFeedbackConstants.VIRTUAL_KEY`,
+  which the system silences when the user has haptics turned off).
+
+The home screen's green dial area is the control this matters most for, so it also
+sinks flat onto the card while it is held.
+
+### The home card
+
+The first draft's card was a white frame around a photo with a full-width green band
+under it, which read as three stacked stripes. The card is now built the way a media
+card is built: the face bleeds to the card's edges with nothing around it, the name
+sits on a shallow band under it, and the green dial block closes the card with the
+card's own bottom corners. The placeholder face was also softened - a 55% ink
+silhouette at 42% of the tile instead of a solid navy poster - because that is what a
+family sees before they have added a photo.
+
+## Adaptive layout (2026-09-18)
+
+The interface was rebuilt on Google's canonical adaptive layout system rather than on
+hand-rolled `Row`/`Column` branches. What that means here, and where the product rules
+decided the answer:
+
+| Question | Answer | Why |
+|---|---|---|
+| Which window size class | `androidx.compose.material3.adaptive.currentWindowAdaptiveInfo()`, read through `ui/adaptive/WindowLayout.kt` | Nothing in the app branches on a device model, a screen diagonal or a raw pixel count. A phone in split screen and a small foldable land in the same class and get the same layout. |
+| How many navigation destinations | Three: `home`, `family`, `editor` | The family area is one destination because the menu and the screen behind it are the two panes of one scaffold. Every previous settings route is gone. |
+| The family area | `ListDetailPaneScaffold` + `rememberListDetailPaneScaffoldNavigator` | Compact: the menu and the section are one at a time, with a pane transition. Medium and wider: the menu stays beside the section it opened, and the section drops its back arrow because there is nothing to go back to. The scaffold owns that back stack. |
+| The home screen | One pane, `LazyVerticalGrid` | There is exactly one thing an elderly user does, so there is nothing to navigate between and no navigation suite: a bottom bar with one tab would be decoration. |
+| How many columns of relatives | Measured: the grid uses two columns when the current width fits four characters at the current text size | This is the one structural decision a size class cannot make, because it depends on the text *inside* the window and on the system font scale, both of which change inside one size class. It is the only `BoxWithConstraints` in the app, and it exists for that reason. |
+| Reading width | Content is capped at 600 dp and centred | A row of settings text stretched across a tablet is unreadable, which is the case the 600 dp measure exists for. |
+| Insets | Collected once by the `Scaffold` each screen uses and applied once to its content column | No screen reads `WindowInsets` by hand any more, so nothing can double-pad or swallow the navigation bar. |
+| State | Hoisted: screens take state and callbacks, panes take the numbers they draw | `FamilyMenuPane(contactCount = ...)` is a pure function of its arguments, which is also what makes it previewable without a ViewModel. |
+| Lazy lists | Stable `key` and `contentType` on every item, `Modifier.animateItem()` where order can change | Reordering a relative slides the card instead of redrawing the list. |
+| Previews | `ui/preview/ScreenPreviews.kt`: home and family menu at phone and tablet sizes | The two layouts that have to survive both windows are the ones kept in front of a reviewer. |
+
+Material 3 Adaptive is pinned at **1.2.0**: 1.3.0 requires `compileSdk 37` and AGP 9.1,
+the same wall the Compose 1.12.x line hits, and 1.2.0 declares `minCompileSdk 35`,
+`minSdk 21` and AGP 8.6 - all inside the versions this project pins.
+
+### Motion
+
+Every animation in the app is short and answers something the hand just did:
+
+- pressing any control darkens it, shrinks it and springs it back (see above);
+- moving between destinations slides and fades in 220 ms, so the direction of travel is
+  visible;
+- switching a pane in the family area is the scaffold's own transition;
+- the home screen crossfades between loading, empty, failed and loaded instead of
+  replacing the page in one frame, and the "handing off to the phone" notice fades and
+  scales in;
+- list rows and grid cards animate their placement.
+
+No animation runs longer than 220 ms, none of them loops, and none of them is the only
+way to know that something happened.
+
+### Two rules the layout is checked against
+
+Both came out of the owner reading a screenshot of the two-pane layout and pointing at
+things that were structurally wrong rather than merely plain.
+
+1. **Both panes of a two-pane screen start their content on the same line.** The list
+   pane had a subtitle under its title ("5 contacts at the moment") and the detail pane
+   did not, so the two columns began a whole line apart and the page looked broken.
+   Every family screen now has the same header - a one-line bar plus one muted
+   description - and the description is the same sentence the menu row uses.
+   Verified by reading the accessibility tree: both subtitles at y=171, both titles at
+   y=93, in a 1440 x 1067 dp window.
+2. **A label sits flush with the container it labels.** Section headings had a 4 dp
+   inset against their card, which reads as a mistake rather than as hierarchy.
+
+### The fluorescent colour
+
+`#D6FF00` was in three places: the launcher icon's background, a tile behind the family
+entry on the home screen, and the selected chip on the language and dialling-code
+screen. The owner asked for it to be taken out of the interface, so the two in-app uses
+are gone - the family entry now uses the same sunken tile as every other row, and the
+selected chip uses the same quiet ink tint as every other selected control. The colour
+scheme's `primaryContainer` also pointed at it, which would have painted any Material
+component that reached for that role; it now points at the neutral tint, so
+`AppColors.BrandLime` is read by nothing under `ui/`. What remains is the launcher
+icon, which is the owner's own artwork.
 
 ## Modularity
 

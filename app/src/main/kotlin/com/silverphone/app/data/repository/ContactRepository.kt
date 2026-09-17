@@ -177,6 +177,28 @@ class ContactRepository(
         ContactWriteResult.Success
     }
 
+    /**
+     * Deletes several contacts in one transaction.
+     *
+     * The management screen's multi-select delete has to be all-or-nothing: a family
+     * member who selected four people and confirmed once must not end up with two of
+     * them gone because the fourth write failed. Photos are deleted explicitly for the
+     * same reason the single delete does it - it must not depend on the foreign-key
+     * pragma being on - and the stored order is compacted once at the end.
+     */
+    suspend fun deleteContacts(ids: List<String>): ContactWriteResult = writeTransaction(
+        onFailure = { failure -> ContactWriteResult.StorageFailed(failure) },
+    ) {
+        if (ids.isEmpty()) return@writeTransaction ContactWriteResult.NotFound
+        val existing = ids.filter { id -> contacts.findById(id) != null }
+        if (existing.isEmpty()) return@writeTransaction ContactWriteResult.NotFound
+        existing.forEach { id -> photos.delete(id) }
+        contacts.deleteByIds(existing)
+        compactSortOrder()
+        bumpRevision()
+        ContactWriteResult.Success
+    }
+
     suspend fun moveContact(id: String, direction: MoveDirection): ContactWriteResult =
         writeTransaction(
             onFailure = { failure -> ContactWriteResult.StorageFailed(failure) },

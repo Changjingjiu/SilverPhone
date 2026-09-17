@@ -33,6 +33,7 @@ hoped for. Where a version had to differ from the documents, the reason is state
 | androidx.activity:activity-compose | 1.12.4 | 23 | 36 |
 | androidx.lifecycle:* | 2.10.0 | 23 | 35 |
 | androidx.navigation:navigation-compose | 2.9.8 | 21 | 35 |
+| androidx.compose.material3.adaptive:adaptive / -layout / -navigation | 1.2.0 | 21 | 35 |
 | androidx.exifinterface:exifinterface | 1.4.2 | 21 | 34 |
 | androidx.room:* | 2.8.5 | 23 | 34 |
 | org.jetbrains.kotlinx:kotlinx-serialization-json | 1.11.0 | — | — |

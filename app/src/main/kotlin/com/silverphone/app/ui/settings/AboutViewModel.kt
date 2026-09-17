@@ -44,6 +44,7 @@ sealed interface UpdateState {
 class AboutViewModel(
     private val releases: ReleaseSource,
     val installedVersionName: String = BuildConfig.VERSION_NAME,
+    /** Kept for the "is this newer?" comparison; never shown to a person. */
     val installedVersionCode: Int = BuildConfig.VERSION_CODE,
 ) : ViewModel() {
 

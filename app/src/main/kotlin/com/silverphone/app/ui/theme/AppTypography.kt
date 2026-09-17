@@ -12,10 +12,11 @@ import com.silverphone.app.domain.FontPreset
 /**
  * The role-based text styles, at the sizes the 1.0 preset uses.
  *
- * The 1.0 preset is deliberately the ordinary Android scale - 28 sp for a screen
- * title, 16 sp for body text, 14 sp for secondary text - so that at the default
- * setting the app reads like any other app a younger person uses. The presets above
- * it are what the family reaches for when the elderly user needs more.
+ * The 1.0 preset is the ordinary size text has on a phone: 20 sp for a screen title,
+ * 16 sp for the name on a card, 14 sp for body text and buttons, 12 sp for the small
+ * print. It is the default because a page whose every line is already enlarged is a
+ * page that is crowded rather than clear - the family raises the size when the person
+ * reading it needs that, with the three presets above.
  *
  * Scaling works by multiplying the base sp value by the preset ratio and then
  * handing the result to Compose, which resolves sp through the system font scale.
@@ -28,13 +29,15 @@ data class AppTextStyles(
     val button: TextStyle,
     val body: TextStyle,
     val caption: TextStyle,
+    /** The small heading above a group of rows, distinct from a paragraph. */
+    val section: TextStyle,
 )
 
-private const val PAGE_TITLE_BASE_SP = 28f
-private const val CONTACT_NAME_BASE_SP = 22f
-private const val BUTTON_BASE_SP = 16f
-private const val BODY_BASE_SP = 16f
-private const val CAPTION_BASE_SP = 14f
+private const val PAGE_TITLE_BASE_SP = 20f
+private const val CONTACT_NAME_BASE_SP = 16f
+private const val BUTTON_BASE_SP = 14f
+private const val BODY_BASE_SP = 14f
+private const val CAPTION_BASE_SP = 12f
 
 fun appTextStyles(preset: FontPreset): AppTextStyles {
     val ratio = preset.scale
@@ -44,18 +47,21 @@ fun appTextStyles(preset: FontPreset): AppTextStyles {
             fontWeight = FontWeight.SemiBold,
             fontSize = (PAGE_TITLE_BASE_SP * ratio).sp,
             lineHeight = (PAGE_TITLE_BASE_SP * ratio * 1.35f).sp,
+            letterSpacing = 0.sp,
         ),
         contactName = TextStyle(
             fontFamily = FontFamily.SansSerif,
             fontWeight = FontWeight.SemiBold,
             fontSize = (CONTACT_NAME_BASE_SP * ratio).sp,
             lineHeight = (CONTACT_NAME_BASE_SP * ratio * 1.35f).sp,
+            letterSpacing = 0.sp,
         ),
         button = TextStyle(
             fontFamily = FontFamily.SansSerif,
             fontWeight = FontWeight.SemiBold,
             fontSize = (BUTTON_BASE_SP * ratio).sp,
             lineHeight = (BUTTON_BASE_SP * ratio * 1.3f).sp,
+            letterSpacing = 0.sp,
         ),
         body = TextStyle(
             fontFamily = FontFamily.SansSerif,
@@ -68,6 +74,15 @@ fun appTextStyles(preset: FontPreset): AppTextStyles {
             fontWeight = FontWeight.Normal,
             fontSize = (CAPTION_BASE_SP * ratio).sp,
             lineHeight = (CAPTION_BASE_SP * ratio * 1.4f).sp,
+        ),
+        // A hair of letter spacing is what separates "a heading over a group" from
+        // "a sentence" without changing the size or the weight.
+        section = TextStyle(
+            fontFamily = FontFamily.SansSerif,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = (CAPTION_BASE_SP * ratio).sp,
+            lineHeight = (CAPTION_BASE_SP * ratio * 1.3f).sp,
+            letterSpacing = 0.6.sp,
         ),
     )
 }

@@ -1,7 +1,11 @@
 package com.silverphone.app.ui.contacts
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +23,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Refresh
@@ -26,11 +32,12 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,8 +56,15 @@ import com.silverphone.app.domain.DisplayNameRules
 import com.silverphone.app.domain.PlaceholderColor
 import com.silverphone.app.platform.contacts.SystemPhoneNumber
 import com.silverphone.app.platform.contacts.SystemPhoneType
+import com.silverphone.app.ui.components.AppTextField
+import com.silverphone.app.ui.components.CompactActionButton
 import com.silverphone.app.ui.components.MessageState
-import com.silverphone.app.ui.components.PrimaryActionButton
+import com.silverphone.app.ui.components.PRESSED_SCALE_GENTLE
+import com.silverphone.app.ui.components.FilledActionButton
+import com.silverphone.app.ui.components.QuietActionButton
+import com.silverphone.app.ui.components.SectionCard
+import com.silverphone.app.ui.components.pressScale
+import com.silverphone.app.ui.components.rememberPressFeedback
 import com.silverphone.app.ui.theme.AppColors
 import com.silverphone.app.ui.theme.LocalAppDimens
 import com.silverphone.app.ui.theme.LocalAppTextStyles
@@ -61,7 +75,7 @@ import com.silverphone.app.ui.theme.LocalAppTextStyles
  * list, and the two small dialogs.
  */
 
-private val THUMB = 64.dp
+private val THUMB = 48.dp
 
 @Composable
 internal fun PermissionRequestBody(onRequestPermission: () -> Unit) {
@@ -74,17 +88,21 @@ internal fun PermissionRequestBody(onRequestPermission: () -> Unit) {
             .padding(dimens.pagePadding),
         verticalArrangement = Arrangement.spacedBy(dimens.touchGap),
     ) {
-        Text(
-            text = stringResource(R.string.contacts_intro),
-            style = styles.body,
-            color = AppColors.TextPrimary,
-        )
-        Text(
-            text = stringResource(R.string.contacts_intro_hint),
-            style = styles.caption,
-            color = AppColors.TextSecondary,
-        )
-        PrimaryActionButton(
+        SectionCard {
+            Column(verticalArrangement = Arrangement.spacedBy(dimens.spaceSnug)) {
+                Text(
+                    text = stringResource(R.string.contacts_intro),
+                    style = styles.body,
+                    color = AppColors.TextPrimary,
+                )
+                Text(
+                    text = stringResource(R.string.contacts_intro_hint),
+                    style = styles.caption,
+                    color = AppColors.TextSecondary,
+                )
+            }
+        }
+        FilledActionButton(
             text = stringResource(R.string.contacts_allow),
             icon = Icons.Filled.Person,
             onClick = onRequestPermission,
@@ -104,23 +122,18 @@ internal fun PermissionDeniedBody(
         title = stringResource(R.string.contacts_denied),
         hint = stringResource(R.string.contacts_denied_hint),
         actions = {
-            PrimaryActionButton(
+            FilledActionButton(
                 text = stringResource(R.string.contacts_retry_permission),
                 icon = Icons.Filled.Refresh,
                 onClick = onRequestPermission,
-                modifier = Modifier.fillMaxWidth(),
             )
-            PrimaryActionButton(
+            QuietActionButton(
                 text = stringResource(R.string.contacts_open_settings),
-                icon = Icons.Filled.Settings,
                 onClick = onOpenAppSettings,
-                modifier = Modifier.fillMaxWidth(),
             )
-            PrimaryActionButton(
+            QuietActionButton(
                 text = stringResource(R.string.contacts_manual_add),
-                icon = Icons.Filled.Edit,
                 onClick = onManualAdd,
-                modifier = Modifier.fillMaxWidth(),
             )
         },
     )
@@ -151,24 +164,25 @@ internal fun PickBody(
     val styles = LocalAppTextStyles.current
 
     Column(modifier = Modifier.fillMaxSize()) {
-        OutlinedTextField(
+        AppTextField(
             value = state.query,
             onValueChange = onQueryChange,
-            singleLine = true,
-            textStyle = styles.body,
-            label = { Text(stringResource(R.string.contacts_search_hint), style = styles.caption) },
+            label = stringResource(R.string.contacts_search_hint),
             leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null, tint = AppColors.Ink) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = dimens.inputHeight)
-                .padding(horizontal = dimens.pagePadding, vertical = dimens.touchGap),
+            minHeight = dimens.inputHeight,
+            modifier = Modifier.padding(
+                start = dimens.pagePadding,
+                end = dimens.pagePadding,
+                top = dimens.touchGap,
+                bottom = dimens.touchGap,
+            ),
         )
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = dimens.pagePadding),
-            horizontalArrangement = Arrangement.spacedBy(dimens.touchGap),
+            horizontalArrangement = Arrangement.spacedBy(dimens.spaceRoomy),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
@@ -177,18 +191,16 @@ internal fun PickBody(
                 color = AppColors.TextSecondary,
                 modifier = Modifier.weight(1f),
             )
-            TextButton(
+            // Two text actions, not two outlined chips. Side by side, their borders sat
+            // a hair apart and read as one control with a line through it.
+            QuietActionButton(
+                text = stringResource(R.string.contacts_select_all),
                 onClick = onSelectAllVisible,
-                modifier = Modifier.heightIn(min = dimens.minTouchTarget),
-            ) {
-                Text(stringResource(R.string.contacts_select_all), style = styles.caption)
-            }
-            TextButton(
+            )
+            QuietActionButton(
+                text = stringResource(R.string.contacts_clear_selection),
                 onClick = onClearSelection,
-                modifier = Modifier.heightIn(min = dimens.minTouchTarget),
-            ) {
-                Text(stringResource(R.string.contacts_clear_selection), style = styles.caption)
-            }
+            )
         }
 
         LazyColumn(
@@ -223,22 +235,57 @@ private fun CandidateRow(
 ) {
     val dimens = LocalAppDimens.current
     val styles = LocalAppTextStyles.current
+    val shape = RoundedCornerShape(dimens.cardCorner)
+
+    val interactionSource = remember { MutableInteractionSource() }
+    val press = rememberPressFeedback(interactionSource, pressedScale = PRESSED_SCALE_GENTLE)
+    val fill by animateColorAsState(
+        targetValue = when {
+            candidate.selected -> AppColors.InkSoft
+            press.pressed -> AppColors.SurfacePressed
+            else -> AppColors.Surface
+        },
+        animationSpec = tween(90),
+        label = "candidateFill",
+    )
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(dimens.cardCorner))
-            .background(AppColors.Surface)
-            .clickable(onClick = onToggle)
+            .pressScale(press.scale)
+            .clip(shape)
+            .background(fill)
+            .border(
+                width = if (candidate.selected) 2.dp else 1.dp,
+                color = if (candidate.selected) AppColors.Ink else AppColors.Hairline,
+                shape = shape,
+            )
+            .clickable(
+                interactionSource = interactionSource,
+                indication = ripple(color = AppColors.Ink),
+                onClick = onToggle,
+            )
             .padding(dimens.cardInnerPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Checkbox(checked = candidate.selected, onCheckedChange = { onToggle() })
+        // One line per person: the tick, the face, the name and number, and the one
+        // action this row has. The first version put a second column of buttons inside
+        // the text column, which pushed the rows to 140 dp each and left the name and
+        // number fighting with a button for the same width.
+        Checkbox(
+            checked = candidate.selected,
+            onCheckedChange = { onToggle() },
+            colors = CheckboxDefaults.colors(
+                checkedColor = AppColors.Ink,
+                uncheckedColor = AppColors.Outline,
+                checkmarkColor = AppColors.Surface,
+            ),
+        )
 
         Box(
             modifier = Modifier
                 .size(THUMB)
-                .clip(RoundedCornerShape(10.dp))
+                .clip(RoundedCornerShape(dimens.photoCorner))
                 .background(AppColors.placeholderBackground(PlaceholderColor.LIGHT_BLUE)),
         ) {
             val photoUri = candidate.contact.photoUri
@@ -256,7 +303,7 @@ private fun CandidateRow(
                     tint = AppColors.Ink,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(10.dp)
+                        .padding(8.dp)
                         .clearAndSetSemantics { },
                 )
             }
@@ -265,7 +312,7 @@ private fun CandidateRow(
         Spacer(Modifier.width(dimens.cardInnerPadding))
 
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = candidate.effectiveName, style = styles.body, color = AppColors.TextPrimary)
+            Text(text = candidate.effectiveName, style = styles.button, color = AppColors.TextPrimary)
 
             val chosen = candidate.chosenNumber
             Text(
@@ -291,31 +338,24 @@ private fun CandidateRow(
                 )
             }
 
-            // Stacked, not side by side. Two labelled buttons need about 240 dp and
-            // the text column beside the checkbox and thumbnail only has 231 dp on a
-            // 411 dp phone, so 修改 was squeezed to nothing at the larger presets.
-            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                if (candidate.contact.numbers.size > 1) {
-                    TextButton(
-                        onClick = onPickNumber,
-                        contentPadding = PaddingValues(4.dp),
-                        modifier = Modifier.heightIn(min = dimens.minTouchTarget),
-                    ) {
-                        Text(
-                            text = stringResource(R.string.contacts_number_picker_title),
-                            style = styles.caption,
-                        )
-                    }
-                }
-                TextButton(
-                    onClick = onEditName,
-                    contentPadding = PaddingValues(4.dp),
-                    modifier = Modifier.heightIn(min = dimens.minTouchTarget),
-                ) {
-                    Text(stringResource(R.string.manage_edit), style = styles.caption)
-                }
+            // Only when the contact really has several numbers, and only until one is
+            // chosen: the picker then sits with the problem it solves instead of
+            // occupying every row.
+            if (candidate.contact.numbers.size > 1) {
+                QuietActionButton(
+                    text = stringResource(R.string.contacts_number_picker_title),
+                    onClick = onPickNumber,
+                    modifier = Modifier.padding(top = 2.dp),
+                )
             }
         }
+
+        Spacer(Modifier.width(dimens.spaceSnug))
+
+        QuietActionButton(
+            text = stringResource(R.string.manage_edit),
+            onClick = onEditName,
+        )
     }
 }
 
@@ -392,12 +432,10 @@ internal fun NameEditorDialog(
         title = { Text(stringResource(R.string.contacts_name_editor_label), style = styles.body) },
         text = {
             Column {
-                OutlinedTextField(
+                AppTextField(
                     value = draft,
                     onValueChange = { draft = it; onNameChanged(it) },
-                    singleLine = true,
                     isError = !valid,
-                    textStyle = styles.body,
                     supportingText = {
                         Text(
                             // While the field is in error the hint must explain the

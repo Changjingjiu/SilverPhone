@@ -47,9 +47,12 @@ fun PlaceholderAvatar(
         Icon(
             imageVector = Icons.Filled.Person,
             contentDescription = null,
-            tint = AppColors.Ink,
+            // A softened ink rather than the full-strength navy: at the size of a card
+            // the solid silhouette read as a poster of a person instead of a blank
+            // space waiting for a photo.
+            tint = AppColors.Ink.copy(alpha = 0.55f),
             modifier = Modifier
-                .fillMaxSize(0.62f)
+                .fillMaxSize(0.42f)
                 .clearAndSetSemantics { },
         )
     }

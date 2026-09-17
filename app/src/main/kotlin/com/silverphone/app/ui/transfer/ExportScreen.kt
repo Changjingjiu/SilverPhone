@@ -5,9 +5,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -15,7 +18,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Text
@@ -25,8 +27,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.silverphone.app.R
-import com.silverphone.app.ui.components.BackActionButton
-import com.silverphone.app.ui.components.PrimaryActionButton
+import com.silverphone.app.ui.components.FamilyScreen
+import com.silverphone.app.ui.components.FilledActionButton
+import com.silverphone.app.ui.components.SectionCard
 import com.silverphone.app.ui.theme.AppColors
 import com.silverphone.app.ui.theme.LocalAppDimens
 import com.silverphone.app.ui.theme.LocalAppTextStyles
@@ -58,11 +61,12 @@ fun ExportScreen(
         contract = ActivityResultContracts.CreateDocument("application/zip"),
     ) { uri -> onSaveTargetChosen(uri) }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(AppColors.Background)
-            .windowInsetsPadding(WindowInsets.safeDrawing),
+    FamilyScreen(
+        title = stringResource(R.string.export_title),
+        subtitle = stringResource(R.string.settings_export_desc),
+        onBack = onBack,
+        backLabel = stringResource(R.string.action_back),
+        modifier = modifier.fillMaxSize(),
     ) {
         Column(
             modifier = Modifier
@@ -71,42 +75,40 @@ fun ExportScreen(
                 .padding(dimens.pagePadding),
             verticalArrangement = Arrangement.spacedBy(dimens.touchGap),
         ) {
-            Text(
-                text = stringResource(R.string.export_title),
-                style = styles.pageTitle,
-                color = AppColors.TextPrimary,
-            )
 
-            Text(
-                text = stringResource(R.string.export_summary, state.contactCount, state.photoCount),
-                style = styles.body,
-                color = AppColors.TextPrimary,
-            )
-            Text(
-                text = stringResource(R.string.export_includes),
-                style = styles.caption,
-                color = AppColors.TextSecondary,
-            )
-            Text(
-                text = stringResource(R.string.export_excludes),
-                style = styles.caption,
-                color = AppColors.TextSecondary,
-            )
-            Text(
-                text = stringResource(R.string.export_privacy),
-                style = styles.caption,
-                color = AppColors.DangerRed,
-            )
+            // What goes in the file, what does not, and who should receive it: three
+            // facts that belong together, in one card, above the button that makes it.
+            SectionCard {
+                Column(verticalArrangement = Arrangement.spacedBy(dimens.spaceSnug)) {
+                    Text(
+                        text = stringResource(
+                            R.string.export_summary,
+                            state.contactCount,
+                            state.photoCount,
+                        ),
+                        style = styles.button,
+                        color = AppColors.TextPrimary,
+                    )
+                    Text(
+                        text = stringResource(R.string.export_includes),
+                        style = styles.caption,
+                        color = AppColors.TextSecondary,
+                    )
+                    Text(
+                        text = stringResource(R.string.export_excludes),
+                        style = styles.caption,
+                        color = AppColors.TextSecondary,
+                    )
+                    Text(
+                        text = stringResource(R.string.export_privacy),
+                        style = styles.caption,
+                        color = AppColors.DangerRed,
+                    )
+                }
+            }
 
             StatusMessage(state.exportStatus)
-        }
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimens.pagePadding),
-            verticalArrangement = Arrangement.spacedBy(dimens.touchGap),
-        ) {
             if (state.contactCount == 0) {
                 Text(
                     text = stringResource(R.string.export_empty),
@@ -115,13 +117,14 @@ fun ExportScreen(
                 )
             }
 
+            // The actions follow the archive they act on, at the end of the page,
+            // instead of sitting in a bar that covers it.
             val filePrefix = stringResource(R.string.export_file_prefix)
-            PrimaryActionButton(
+            FilledActionButton(
                 text = stringResource(R.string.export_generate),
                 icon = Icons.Filled.Refresh,
                 enabled = state.canGenerate,
                 onClick = { onGenerate(filePrefix) },
-                modifier = Modifier.fillMaxWidth(),
             )
 
             if (state.generating) {
@@ -134,33 +137,31 @@ fun ExportScreen(
 
             val generated = state.generated
             if (generated != null) {
-                PrimaryActionButton(
-                    text = stringResource(R.string.export_save),
-                    icon = Icons.Filled.Check,
-                    enabled = !state.saving,
-                    onClick = { saveLauncher.launch(generated.file.name) },
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                PrimaryActionButton(
-                    text = stringResource(R.string.export_share),
-                    icon = Icons.Filled.Share,
-                    enabled = !state.saving,
-                    onClick = {
-                        val intent = onBuildShareIntent()
-                        if (intent != null) {
-                            context.startActivity(onChooserFor(intent))
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                Row(horizontalArrangement = Arrangement.spacedBy(dimens.touchGap)) {
+                    FilledActionButton(
+                        text = stringResource(R.string.export_save),
+                        icon = Icons.Filled.Check,
+                        enabled = !state.saving,
+                        onClick = { saveLauncher.launch(generated.file.name) },
+                        modifier = Modifier.weight(1f),
+                    )
+                    FilledActionButton(
+                        text = stringResource(R.string.export_share),
+                        icon = Icons.Filled.Share,
+                        enabled = !state.saving,
+                        emphasis = false,
+                        onClick = {
+                            val intent = onBuildShareIntent()
+                            if (intent != null) {
+                                context.startActivity(onChooserFor(intent))
+                            }
+                        },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
             }
 
-            BackActionButton(
-                text = stringResource(R.string.action_back),
-                icon = Icons.Filled.Info,
-                onClick = onBack,
-                modifier = Modifier.fillMaxWidth(),
-            )
+            Spacer(Modifier.height(dimens.spaceSnug))
         }
     }
 }

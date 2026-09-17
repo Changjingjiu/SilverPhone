@@ -44,6 +44,7 @@
     <string name="settings_permission">Calling permission &amp; how to use</string>
     <string name="settings_permission_desc">How calls are placed, and common questions</string>
     <string name="settings_back_home">Back to the call screen</string>
+    <string name="settings_detail_empty">Choose something on the left to open it here.</string>
     <string name="settings_count">%1$d contacts at the moment</string>
 
     <!-- ============ S12 language and dialling code ============ -->
@@ -54,9 +55,10 @@
     <string name="preferences_country_title">Dialling code</string>
     <string name="preferences_country_note">Numbers stored without a country code get this one added when they are dialled. A number that already starts with + is left exactly as it is.</string>
     <string name="preferences_country_short_note">Short service numbers such as 110 or 10086 are dialled as they are, with no code added. A number written with a leading 0 - a landline, say 01012345678 - is dialled as +86 10 1234 5678: the 0 belongs to the old country, and the dialling code replaces it.</string>
+    <string name="preferences_country_quick">Common codes — tap to fill the field</string>
     <string name="preferences_country_none">Add nothing</string>
-    <string name="preferences_country_custom">Another code</string>
-    <string name="preferences_country_custom_hint">For example: +1</string>
+    <string name="preferences_country_custom">Type your own code</string>
+    <string name="preferences_country_custom_hint">For example: +33</string>
     <string name="preferences_country_invalid">That code is not the right shape. It should be a + followed by 1 to 4 digits.</string>
     <string name="preferences_country_example">Will dial: %1$s</string>
     <string name="preferences_save">Save</string>
@@ -75,6 +77,12 @@
     <string name="manage_empty">No contacts yet. Tap "Add a contact" below to start.</string>
     <string name="manage_search_empty">Nobody matches that search</string>
     <string name="manage_no_photo">No photo yet</string>
+    <string name="manage_long_press_hint">Press and hold a card to select several.</string>
+    <string name="manage_selected_count">%1$d selected</string>
+    <string name="manage_delete_selected">Delete</string>
+    <string name="manage_delete_confirm_title">Delete these %1$d contacts?</string>
+    <string name="manage_delete_confirm_message">Their photos are deleted with them, and this cannot be undone.</string>
+    <string name="manage_delete_failed">Could not delete them. Nothing was changed.</string>
     <string name="manage_capacity">%1$d contacts, which is the limit</string>
 
     <!-- ============ S05 add / edit a contact ============ -->
@@ -260,7 +268,7 @@
     <string name="settings_about">About</string>
     <string name="settings_about_desc">Version, GitHub project, update check and privacy</string>
     <string name="about_title">About</string>
-    <string name="about_version">Version %1$s (%2$d)</string>
+    <string name="about_version">Version %1$s</string>
     <string name="about_github">GitHub project</string>
     <string name="about_updates_title">Updates</string>
     <string name="about_check_updates">Check for updates</string>

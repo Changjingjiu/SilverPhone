@@ -31,11 +31,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -49,6 +51,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -62,17 +65,17 @@ import com.silverphone.app.domain.CountryCode
 import com.silverphone.app.domain.DisplayNameRules
 import com.silverphone.app.domain.PhoneNumberRules
 import com.silverphone.app.domain.PlaceholderColor
-import com.silverphone.app.ui.components.CancelActionButton
-import com.silverphone.app.ui.components.CompactActionButton
+import com.silverphone.app.ui.components.AppTextField
 import com.silverphone.app.ui.components.ContactPhoto
-import com.silverphone.app.ui.components.DangerActionButton
+import com.silverphone.app.ui.components.FamilyScreen
+import com.silverphone.app.ui.components.FilledActionButton
 import com.silverphone.app.ui.components.PlaceholderAvatar
-import com.silverphone.app.ui.components.PrimaryActionButton
+import com.silverphone.app.ui.components.QuietActionButton
 import com.silverphone.app.ui.theme.AppColors
 import com.silverphone.app.ui.theme.LocalAppDimens
 import com.silverphone.app.ui.theme.LocalAppTextStyles
 
-private val PHOTO_PREVIEW_SIZE = 128.dp
+private val PHOTO_PREVIEW_SIZE = 112.dp
 private const val SWATCHES_PER_ROW = 3
 
 /**
@@ -135,11 +138,23 @@ fun ContactEditorScreen(
 
     BackHandler(enabled = state.hasUnsavedChanges) { confirmDiscard = true }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(AppColors.Background)
-            .windowInsetsPadding(WindowInsets.safeDrawing),
+    FamilyScreen(
+        title = stringResource(
+            if (state.isNew) R.string.editor_add_title else R.string.editor_edit_title,
+        ),
+        onBack = requestBack,
+        backLabel = stringResource(R.string.action_back),
+        modifier = modifier.fillMaxSize(),
+        // Save belongs in the bar, where every other Android form keeps it. A footer
+        // that holds three 64 dp buttons costs a third of the screen and hides the
+        // content it is meant to act on.
+        actions = {
+            QuietActionButton(
+                text = stringResource(R.string.editor_save),
+                enabled = state.canSave,
+                onClick = onSave,
+            )
+        },
     ) {
         Column(
             modifier = Modifier
@@ -148,14 +163,6 @@ fun ContactEditorScreen(
                 .padding(dimens.pagePadding),
             verticalArrangement = Arrangement.spacedBy(dimens.touchGap),
         ) {
-            Text(
-                text = stringResource(
-                    if (state.isNew) R.string.editor_add_title else R.string.editor_edit_title,
-                ),
-                style = styles.pageTitle,
-                color = AppColors.TextPrimary,
-            )
-
             PhotoSection(
                 state = state,
                 enabled = !state.saving,
@@ -163,18 +170,16 @@ fun ContactEditorScreen(
                 onRemovePhoto = onRemovePhoto,
             )
 
-            OutlinedTextField(
+            AppTextField(
                 value = state.name,
                 onValueChange = onNameChange,
-                singleLine = true,
                 // Locked during a save: the write captured the values at tap time, so
                 // an edit made while it is in flight would be silently dropped when
                 // the screen closes on success.
                 enabled = !state.saving,
                 isError = state.nameError != null,
-                textStyle = styles.body,
-                label = { Text(stringResource(R.string.editor_name_label), style = styles.caption) },
-                placeholder = { Text(stringResource(R.string.editor_name_hint), style = styles.caption) },
+                label = stringResource(R.string.editor_name_label),
+                placeholder = stringResource(R.string.editor_name_hint),
                 supportingText = {
                     Text(
                         text = nameSupport(state.nameError),
@@ -182,20 +187,16 @@ fun ContactEditorScreen(
                         color = if (state.nameError != null) AppColors.DangerRed else AppColors.TextSecondary,
                     )
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = dimens.inputHeight),
+                minHeight = dimens.inputHeight,
             )
 
-            OutlinedTextField(
+            AppTextField(
                 value = state.phone,
                 onValueChange = onPhoneChange,
-                singleLine = true,
                 enabled = !state.saving,
                 isError = state.phoneError != null,
-                textStyle = styles.body,
-                label = { Text(stringResource(R.string.editor_phone_label), style = styles.caption) },
-                placeholder = { Text(stringResource(R.string.editor_phone_hint), style = styles.caption) },
+                label = stringResource(R.string.editor_phone_label),
+                placeholder = stringResource(R.string.editor_phone_hint),
                 supportingText = {
                     Text(
                         text = phoneSupport(state.phoneError, state.phone, state.countryCode),
@@ -203,9 +204,7 @@ fun ContactEditorScreen(
                         color = if (state.phoneError != null) AppColors.DangerRed else AppColors.TextSecondary,
                     )
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = dimens.inputHeight),
+                minHeight = dimens.inputHeight,
             )
 
             if (state.sameNumberNotice) {
@@ -253,14 +252,7 @@ fun ContactEditorScreen(
 
                 null -> Unit
             }
-        }
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimens.pagePadding),
-            verticalArrangement = Arrangement.spacedBy(dimens.touchGap),
-        ) {
             if (state.saving) {
                 Text(
                     text = stringResource(R.string.editor_saving),
@@ -268,24 +260,18 @@ fun ContactEditorScreen(
                     color = AppColors.TextSecondary,
                 )
             }
-            PrimaryActionButton(
-                text = stringResource(R.string.editor_save),
-                icon = Icons.Filled.Check,
-                enabled = state.canSave,
-                onClick = onSave,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            CancelActionButton(
-                text = stringResource(R.string.editor_cancel),
-                icon = Icons.Filled.Clear,
-                onClick = requestBack,
-                modifier = Modifier.fillMaxWidth(),
-            )
+
+            // Deleting sits at the end of the form, under a line, as a text action: it
+            // is the one thing on this screen nobody should press by reflex.
             if (!state.isNew) {
-                DangerActionButton(
+                HorizontalDivider(
+                    color = AppColors.Hairline,
+                    modifier = Modifier.padding(top = dimens.spaceRoomy, bottom = dimens.spaceSnug),
+                )
+                QuietActionButton(
                     text = stringResource(R.string.editor_delete),
-                    icon = Icons.Filled.Delete,
                     enabled = !state.saving,
+                    danger = true,
                     onClick = { confirmDelete = true },
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -364,18 +350,19 @@ private fun PhotoSection(
     val hasPhoto = draftBitmap != null ||
         (!state.photoRemoved && state.storedContact?.hasPhoto == true)
 
-    // Preview on the left, actions stacked on the right. The actions then have most
-    // of the width, so 更换照片 never wraps onto two lines even at the largest
-    // preset, and the name and number fields stay on the first screen.
-    Row(
+    // Photo above, actions under it. Side by side looked wrong at every size: a tall
+    // preview next to a short button leaves a band of dead space, and the eye reads the
+    // two as unrelated. Stacked, the block reads as one thing - this is the face, these
+    // are the things you can do to it.
+    Column(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(dimens.touchGap),
-        verticalAlignment = Alignment.CenterVertically,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(dimens.spaceSnug),
     ) {
         Box(
             modifier = Modifier
                 .size(PHOTO_PREVIEW_SIZE)
-                .clip(RoundedCornerShape(dimens.cardCorner)),
+                .clip(RoundedCornerShape(dimens.photoCorner)),
             contentAlignment = Alignment.Center,
         ) {
             when {
@@ -398,34 +385,31 @@ private fun PhotoSection(
             }
         }
 
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(dimens.touchGap / 2),
-        ) {
-            PrimaryActionButton(
-                text = stringResource(
-                    if (hasPhoto) R.string.editor_change_photo else R.string.editor_choose_photo,
-                ),
-                icon = Icons.Filled.Person,
+        FilledActionButton(
+            text = stringResource(
+                if (hasPhoto) R.string.editor_change_photo else R.string.editor_choose_photo,
+            ),
+            icon = Icons.Filled.Person,
+            enabled = enabled,
+            onClick = onPickPhoto,
+        )
+
+        if (hasPhoto) {
+            QuietActionButton(
+                text = stringResource(R.string.editor_remove_photo),
                 enabled = enabled,
-                onClick = onPickPhoto,
+                danger = true,
+                onClick = onRemovePhoto,
+            )
+        } else {
+            Text(
+                text = stringResource(R.string.editor_photo_missing),
+                style = LocalAppTextStyles.current.caption,
+                color = AppColors.TextSecondary,
+                textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
             )
-            if (hasPhoto) {
-                CompactActionButton(
-                    text = stringResource(R.string.editor_remove_photo),
-                    icon = Icons.Filled.Clear,
-                    enabled = enabled,
-                    danger = true,
-                    onClick = onRemovePhoto,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
         }
-    }
-
-    if (!hasPhoto) {
-        Notice(text = stringResource(R.string.editor_photo_missing))
     }
 }
 
@@ -440,17 +424,27 @@ private fun ColorSection(
     Column(verticalArrangement = Arrangement.spacedBy(dimens.touchGap)) {
         Text(
             text = stringResource(R.string.editor_placeholder_label),
-            style = styles.caption,
+            style = styles.section,
             color = AppColors.TextSecondary,
         )
         // Three per row. Six 56 dp swatches with 12 dp gaps need 396 dp, which does
         // not fit the 355 dp of content a 411 dp phone offers - the last swatch was
         // being squeezed into a deformed 39 dp ellipse below the minimum touch size.
+        // Three per row, and each one takes a third of the width. Fixed 56 dp dots left
+        // the right-hand two thirds of the row empty, which read as a layout that had
+        // given up rather than as six choices.
         PlaceholderColor.entries.chunked(SWATCHES_PER_ROW).forEach { rowColors ->
-            Row(horizontalArrangement = Arrangement.spacedBy(dimens.touchGap)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(dimens.touchGap),
+            ) {
                 rowColors.forEach { color ->
                     val isSelected = color == selectedColor
                     val label = placeholderColorLabel(color)
+                    Box(
+                        modifier = Modifier.weight(1f),
+                        contentAlignment = Alignment.Center,
+                    ) {
                     Box(
                         modifier = Modifier
                             .size(dimens.minTouchTarget)
@@ -474,7 +468,23 @@ private fun ColorSection(
                                     true
                                 }
                             },
-                    )
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        // A tick inside the chosen swatch. A ring alone is easy to miss
+                        // at arm's length, and the person choosing the colour is usually
+                        // doing it for someone else's eyes rather than their own.
+                        if (isSelected) {
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = null,
+                                tint = AppColors.Focus,
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clearAndSetSemantics { },
+                            )
+                        }
+                    }
+                    }
                 }
             }
         }
@@ -522,16 +532,30 @@ private fun LoadingEditor(modifier: Modifier = Modifier) {
 private fun Notice(text: String, danger: Boolean = false) {
     val styles = LocalAppTextStyles.current
     val dimens = LocalAppDimens.current
-    Text(
-        text = text,
-        style = styles.caption,
-        color = if (danger) AppColors.DangerRed else AppColors.TextSecondary,
+    val content = if (danger) AppColors.DangerRed else AppColors.TextSecondary
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(dimens.cardCorner))
-            .background(AppColors.Surface)
-            .padding(dimens.cardInnerPadding),
-    )
+            .background(if (danger) AppColors.DangerSoft else AppColors.SurfaceSunken)
+            .padding(dimens.spaceRoomy),
+        verticalAlignment = Alignment.Top,
+    ) {
+        Icon(
+            imageVector = if (danger) Icons.Filled.Warning else Icons.Filled.Info,
+            contentDescription = null,
+            tint = content,
+            modifier = Modifier
+                .size(dimens.secondaryGlyph)
+                .clearAndSetSemantics { },
+        )
+        Text(
+            text = text,
+            style = styles.caption,
+            color = content,
+            modifier = Modifier.padding(start = dimens.spaceSnug),
+        )
+    }
 }
 
 @Composable

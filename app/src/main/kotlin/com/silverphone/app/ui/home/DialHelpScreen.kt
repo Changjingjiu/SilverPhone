@@ -4,8 +4,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.background
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.Composable
@@ -36,7 +37,7 @@ fun DialHelpScreen(
     val icon = when (problem) {
         DialProblem.PermissionMissing -> Icons.Filled.Call
         DialProblem.NoPhoneApp -> Icons.Filled.Warning
-        DialProblem.DispatchFailed -> Icons.Filled.Info
+        DialProblem.DispatchFailed -> Icons.Filled.Refresh
         DialProblem.ContactUnavailable -> Icons.Filled.Warning
         DialProblem.StorageUnavailable -> Icons.Filled.Warning
     }
@@ -79,7 +80,7 @@ fun DialHelpScreen(
             }
             BackActionButton(
                 text = stringResource(R.string.help_back_home),
-                icon = Icons.Filled.Info,
+                icon = Icons.AutoMirrored.Filled.ArrowBack,
                 onClick = onBackHome,
                 modifier = Modifier.fillMaxWidth(),
             )

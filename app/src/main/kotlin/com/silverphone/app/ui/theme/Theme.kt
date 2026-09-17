@@ -34,7 +34,11 @@ fun SilverPhoneTheme(
         lightColorScheme(
             primary = AppColors.Ink,
             onPrimary = Color.White,
-            primaryContainer = AppColors.BrandLime,
+            // Not BrandLime: the fluorescent yellow-green is the launcher icon's
+            // background and nothing else. Wiring it into a container role meant any
+            // Material component that reaches for primaryContainer would paint itself
+            // in it.
+            primaryContainer = AppColors.InkSoft,
             onPrimaryContainer = AppColors.Ink,
             secondary = AppColors.CallGreen,
             onSecondary = AppColors.OnCallGreen,

@@ -78,6 +78,10 @@ class ManageSearchFocusTest {
                     onAdd = {},
                     onEdit = {},
                     onMove = { _, _: MoveDirection -> },
+                    onLongPress = {},
+                    onToggleSelected = {},
+                    onClearSelection = {},
+                    onDeleteSelected = {},
                     onBack = {},
                 )
             }
@@ -118,6 +122,10 @@ class ManageSearchFocusTest {
                     onAdd = {},
                     onEdit = {},
                     onMove = { _, _: MoveDirection -> },
+                    onLongPress = {},
+                    onToggleSelected = {},
+                    onClearSelection = {},
+                    onDeleteSelected = {},
                     onBack = {},
                 )
             }
@@ -149,6 +157,10 @@ class ManageSearchFocusTest {
                     onAdd = {},
                     onEdit = {},
                     onMove = { _, _: MoveDirection -> },
+                    onLongPress = {},
+                    onToggleSelected = {},
+                    onClearSelection = {},
+                    onDeleteSelected = {},
                     onBack = { backs++ },
                 )
             }
@@ -190,6 +202,10 @@ class ManageSearchFocusTest {
                     onAdd = { adds++ },
                     onEdit = {},
                     onMove = { _, _: MoveDirection -> },
+                    onLongPress = {},
+                    onToggleSelected = {},
+                    onClearSelection = {},
+                    onDeleteSelected = {},
                     onBack = { backs++ },
                 )
             }

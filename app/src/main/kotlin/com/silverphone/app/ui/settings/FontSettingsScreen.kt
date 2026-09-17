@@ -1,8 +1,11 @@
 package com.silverphone.app.ui.settings
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,11 +25,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,14 +45,19 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.unit.dp
 import com.silverphone.app.R
 import com.silverphone.app.domain.FontPreset
-import com.silverphone.app.ui.components.CancelActionButton
-import com.silverphone.app.ui.components.PrimaryActionButton
+import com.silverphone.app.domain.PlaceholderColor
+import com.silverphone.app.ui.components.FamilyScreen
+import com.silverphone.app.ui.components.PRESSED_SCALE_GENTLE
+import com.silverphone.app.ui.components.PressHaptics
+import com.silverphone.app.ui.components.QuietActionButton
+import com.silverphone.app.ui.components.pressScale
+import com.silverphone.app.ui.components.rememberPressFeedback
 import com.silverphone.app.ui.theme.AppColors
 import com.silverphone.app.ui.theme.LocalAppDimens
 import com.silverphone.app.ui.theme.LocalAppTextStyles
 
 /** Size of the sample face in the preview card. */
-private val PREVIEW_FACE = 44.dp
+private val PREVIEW_FACE = 52.dp
 
 /**
  * S10: the four text-size presets.
@@ -72,26 +82,16 @@ fun FontSettingsScreen(
     val dimens = LocalAppDimens.current
     val styles = LocalAppTextStyles.current
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(AppColors.Background)
-            .windowInsetsPadding(WindowInsets.safeDrawing),
+    FamilyScreen(
+        title = stringResource(R.string.font_title),
+        subtitle = stringResource(R.string.font_hint),
+        onBack = onCancel,
+        backLabel = stringResource(R.string.action_back),
+        modifier = modifier.fillMaxSize(),
+        actions = {
+            QuietActionButton(text = stringResource(R.string.font_save), onClick = onSave)
+        },
     ) {
-        Column(
-            modifier = Modifier.padding(
-                start = dimens.pagePadding,
-                end = dimens.pagePadding,
-                top = dimens.pagePadding,
-            ),
-            verticalArrangement = Arrangement.spacedBy(dimens.touchGap),
-        ) {
-            Text(
-                text = stringResource(R.string.font_title),
-                style = styles.pageTitle,
-                color = AppColors.TextPrimary,
-            )
-        }
 
         Column(
             modifier = Modifier
@@ -100,16 +100,11 @@ fun FontSettingsScreen(
                 .padding(
                     start = dimens.pagePadding,
                     end = dimens.pagePadding,
-                    top = dimens.touchGap,
+                    top = dimens.spaceRoomy,
                     bottom = dimens.touchGap,
                 ),
             verticalArrangement = Arrangement.spacedBy(dimens.touchGap),
         ) {
-            Text(
-                text = stringResource(R.string.font_hint),
-                style = styles.caption,
-                color = AppColors.TextSecondary,
-            )
             FontPreset.entries.forEach { preset ->
                 PresetOption(
                     preset = preset,
@@ -121,6 +116,7 @@ fun FontSettingsScreen(
                 text = stringResource(R.string.font_scope_note),
                 style = styles.caption,
                 color = AppColors.TextSecondary,
+                modifier = Modifier.padding(top = dimens.spaceTight),
             )
         }
 
@@ -129,44 +125,29 @@ fun FontSettingsScreen(
                 start = dimens.pagePadding,
                 end = dimens.pagePadding,
             ),
-            verticalArrangement = Arrangement.spacedBy(dimens.touchGap),
         ) {
             PreviewCard()
         }
 
-        // Stacked, like every other screen. Side by side, each half-width button had
-        // 59 dp for its label after the icon and padding, so at 超大 both wrapped to
-        // one character per line.
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimens.pagePadding),
-            verticalArrangement = Arrangement.spacedBy(dimens.touchGap),
-        ) {
-            if (state.saveFailed) {
-                Text(
-                    text = stringResource(R.string.preferences_save_failed),
-                    style = styles.body,
-                    color = AppColors.DangerRed,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-            PrimaryActionButton(
-                text = stringResource(R.string.font_save),
-                icon = Icons.Filled.Check,
-                onClick = onSave,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            CancelActionButton(
-                text = stringResource(R.string.font_cancel),
-                icon = Icons.Filled.Clear,
-                onClick = onCancel,
-                modifier = Modifier.fillMaxWidth(),
+        if (state.saveFailed) {
+            Text(
+                text = stringResource(R.string.preferences_save_failed),
+                style = styles.body,
+                color = AppColors.DangerRed,
+                modifier = Modifier.padding(
+                    start = dimens.pagePadding,
+                    end = dimens.pagePadding,
+                    bottom = dimens.touchGap,
+                ),
             )
         }
     }
 }
 
+/**
+ * One size, drawn as a radio option: a filled dot when it is the chosen one, and a
+ * card that darkens under the finger when it is not.
+ */
 @Composable
 private fun PresetOption(
     preset: FontPreset,
@@ -181,18 +162,38 @@ private fun PresetOption(
         FontPreset.EXTRA_LARGE -> stringResource(R.string.font_extra_large)
         FontPreset.HUGE -> stringResource(R.string.font_huge)
     }
+    val shape = RoundedCornerShape(dimens.cardCorner)
+
+    val interactionSource = remember { MutableInteractionSource() }
+    val press = rememberPressFeedback(interactionSource, pressedScale = PRESSED_SCALE_GENTLE)
+    PressHaptics(interactionSource)
+    val fill by animateColorAsState(
+        targetValue = when {
+            press.pressed -> AppColors.SurfacePressed
+            selected -> AppColors.InkSoft
+            else -> AppColors.Surface
+        },
+        animationSpec = tween(90),
+        label = "presetFill",
+    )
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(dimens.cardCorner))
-            .background(AppColors.Surface)
+            .pressScale(press.scale)
+            .clip(shape)
+            .background(fill)
             .border(
-                width = if (selected) 3.dp else 1.dp,
-                color = if (selected) AppColors.Focus else AppColors.Outline,
-                shape = RoundedCornerShape(dimens.cardCorner),
+                width = if (selected) 2.dp else 1.dp,
+                color = if (selected) AppColors.Ink else AppColors.Hairline,
+                shape = shape,
             )
-            .clickable(onClick = onClick)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = ripple(color = AppColors.Ink),
+                role = Role.RadioButton,
+                onClick = onClick,
+            )
             // A border thickness and a tick are invisible to a screen reader, so the
             // choice is exposed as a selected radio option.
             .clearAndSetSemantics {
@@ -205,17 +206,39 @@ private fun PresetOption(
                 }
             }
             .heightIn(min = dimens.minTouchTarget)
-            .padding(horizontal = dimens.cardInnerPadding, vertical = 12.dp),
+            .padding(horizontal = dimens.cardInnerPadding, vertical = dimens.cardInnerPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(
-            imageVector = if (selected) Icons.Filled.Check else Icons.Filled.Person,
-            contentDescription = null,
-            tint = if (selected) AppColors.Focus else AppColors.Outline,
-            modifier = Modifier
-                .size(dimens.secondaryGlyph)
-                .clearAndSetSemantics { },
-        )
+        Box(
+            modifier = Modifier.size(dimens.secondaryGlyph),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (selected) {
+                Box(
+                    modifier = Modifier
+                        .size(dimens.secondaryGlyph)
+                        .clip(CircleShape)
+                        .background(AppColors.Ink),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Check,
+                        contentDescription = null,
+                        tint = AppColors.Surface,
+                        modifier = Modifier
+                            .size(20.dp)
+                            .clearAndSetSemantics { },
+                    )
+                }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(dimens.secondaryGlyph)
+                        .clip(CircleShape)
+                        .border(2.dp, AppColors.Outline, CircleShape),
+                )
+            }
+        }
         Text(
             text = label,
             style = styles.button,
@@ -238,14 +261,16 @@ private fun PresetOption(
 private fun PreviewCard() {
     val dimens = LocalAppDimens.current
     val styles = LocalAppTextStyles.current
+    val shape = RoundedCornerShape(dimens.cardCorner)
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(dimens.cardCorner))
+            .clip(shape)
             .background(AppColors.Surface)
+            .border(1.dp, AppColors.Hairline, shape)
             .padding(10.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(dimens.spaceSnug),
     ) {
         // The face and the two text roles side by side rather than stacked. Stacked,
         // the card grew tall enough that the option list above it showed two of its
@@ -253,7 +278,9 @@ private fun PreviewCard() {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier
-                    .size(PREVIEW_FACE),
+                    .size(PREVIEW_FACE)
+                    .clip(RoundedCornerShape(dimens.chipCorner))
+                    .background(AppColors.placeholderBackground(PlaceholderColor.LIGHT_BLUE)),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
@@ -281,7 +308,7 @@ private fun PreviewCard() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(dimens.cardCorner))
+                .clip(RoundedCornerShape(dimens.photoCorner))
                 .background(AppColors.CallGreen)
                 .heightIn(min = dimens.primaryButtonHeight),
             verticalAlignment = Alignment.CenterVertically,

@@ -38,7 +38,6 @@ class AboutScreenTest {
             SilverPhoneTheme(fontPreset = FontPreset.STANDARD) {
                 AboutScreen(
                     installedVersionName = "1.0.0",
-                    installedVersionCode = 1,
                     updateState = updateState,
                     onCheckForUpdates = {},
                     onBack = {},
@@ -52,7 +51,7 @@ class AboutScreenTest {
         show(UpdateState.NotChecked)
 
         composeRule.onNodeWithText(text(R.string.about_title)).assertIsDisplayed()
-        composeRule.onNodeWithText(context.getString(R.string.about_version, "1.0.0", 1))
+        composeRule.onNodeWithText(context.getString(R.string.about_version, "1.0.0"))
             .assertIsDisplayed()
         // The address is readable as text, not only as a tappable glyph.
         composeRule.onNodeWithText(ProjectLinks.REPOSITORY_DISPLAY).assertIsDisplayed()

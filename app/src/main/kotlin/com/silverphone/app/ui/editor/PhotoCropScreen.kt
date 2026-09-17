@@ -9,13 +9,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -32,8 +34,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.canhub.cropper.CropImageView
 import com.silverphone.app.R
 import com.silverphone.app.domain.ContactLimits
-import com.silverphone.app.ui.components.CancelActionButton
-import com.silverphone.app.ui.components.PrimaryActionButton
+import com.silverphone.app.ui.components.FamilyScreen
+import com.silverphone.app.ui.components.FilledActionButton
 import com.silverphone.app.ui.theme.AppColors
 import com.silverphone.app.ui.theme.LocalAppDimens
 import com.silverphone.app.ui.theme.LocalAppTextStyles
@@ -65,29 +67,25 @@ fun PhotoCropScreen(
     // family just typed are lost.
     BackHandler(enabled = true) { onCancel() }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(AppColors.Background)
-            .windowInsetsPadding(WindowInsets.safeDrawing)
-            .padding(dimens.pagePadding),
-        verticalArrangement = Arrangement.spacedBy(dimens.touchGap),
+    FamilyScreen(
+        title = stringResource(R.string.crop_title),
+        subtitle = stringResource(R.string.crop_hint),
+        onBack = onCancel,
+        backLabel = stringResource(R.string.action_back),
+        modifier = modifier.fillMaxSize(),
     ) {
-        Text(
-            text = stringResource(R.string.crop_title),
-            style = styles.pageTitle,
-            color = AppColors.TextPrimary,
-        )
-        Text(
-            text = stringResource(R.string.crop_hint),
-            style = styles.caption,
-            color = AppColors.TextSecondary,
-        )
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(dimens.pagePadding),
+            verticalArrangement = Arrangement.spacedBy(dimens.touchGap),
+        ) {
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f),
+                .weight(1f)
+                .clip(RoundedCornerShape(dimens.cardCorner)),
             contentAlignment = Alignment.Center,
         ) {
             AndroidView(
@@ -156,38 +154,43 @@ fun PhotoCropScreen(
             )
         }
 
-        PrimaryActionButton(
-            text = stringResource(R.string.crop_use),
-            icon = Icons.Filled.Check,
-            // Cropping before the image has loaded reports a failure and would then
-            // look like a broken photo, so the action stays unavailable until there
-            // is something to crop.
-            enabled = !failed && !loading,
-            onClick = {
-                val view = cropView
-                if (view == null) {
-                    failed = true
-                } else {
-                    // Ask for a result no larger than the stored edge, at the
-                    // highest quality; the normaliser enforces the byte limit.
-                    view.croppedImageAsync(
-                        Bitmap.CompressFormat.JPEG,
-                        90,
-                        ContactLimits.MAX_PHOTO_EDGE_PX,
-                        ContactLimits.MAX_PHOTO_EDGE_PX,
-                        CropImageView.RequestSizeOptions.RESIZE_INSIDE,
-                        null,
-                    )
-                }
-            },
-            modifier = Modifier.fillMaxWidth(),
-        )
-
-        CancelActionButton(
-            text = stringResource(R.string.crop_cancel),
-            icon = Icons.Filled.Clear,
-            onClick = onCancel,
-            modifier = Modifier.fillMaxWidth(),
-        )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(dimens.touchGap),
+            ) {
+                FilledActionButton(
+                    text = stringResource(R.string.crop_use),
+                    icon = Icons.Filled.Check,
+                    // Cropping before the image has loaded reports a failure and would
+                    // then look like a broken photo, so the action stays unavailable
+                    // until there is something to crop.
+                    enabled = !failed && !loading,
+                    onClick = {
+                        val view = cropView
+                        if (view == null) {
+                            failed = true
+                        } else {
+                            // Ask for a result no larger than the stored edge, at the
+                            // highest quality; the normaliser enforces the byte limit.
+                            view.croppedImageAsync(
+                                Bitmap.CompressFormat.JPEG,
+                                90,
+                                ContactLimits.MAX_PHOTO_EDGE_PX,
+                                ContactLimits.MAX_PHOTO_EDGE_PX,
+                                CropImageView.RequestSizeOptions.RESIZE_INSIDE,
+                                null,
+                            )
+                        }
+                    },
+                    modifier = Modifier.weight(1f),
+                )
+                FilledActionButton(
+                    text = stringResource(R.string.crop_cancel),
+                    emphasis = false,
+                    onClick = onCancel,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
     }
 }

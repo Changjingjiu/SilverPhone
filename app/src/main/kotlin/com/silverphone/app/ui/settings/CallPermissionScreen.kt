@@ -13,18 +13,21 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.silverphone.app.R
 import com.silverphone.app.platform.openAppSettingsPage
-import com.silverphone.app.ui.components.BackActionButton
-import com.silverphone.app.ui.components.PrimaryActionButton
+import com.silverphone.app.ui.components.FilledActionButton
+import com.silverphone.app.ui.components.FamilyScreen
+import com.silverphone.app.ui.components.SectionCard
+import com.silverphone.app.ui.components.StatusCard
+import com.silverphone.app.ui.components.StatusTone
 import com.silverphone.app.ui.theme.AppColors
 import com.silverphone.app.ui.theme.LocalAppDimens
 import com.silverphone.app.ui.theme.LocalAppTextStyles
@@ -51,96 +54,72 @@ fun CallPermissionScreen(
     val dimens = LocalAppDimens.current
     val styles = LocalAppTextStyles.current
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(AppColors.Background)
-            .windowInsetsPadding(WindowInsets.safeDrawing),
+    FamilyScreen(
+        title = stringResource(R.string.settings_permission),
+        subtitle = stringResource(R.string.settings_permission_desc),
+        onBack = onBack,
+        backLabel = stringResource(R.string.action_back),
+        modifier = modifier.fillMaxSize(),
     ) {
         Column(
             modifier = Modifier
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
                 .padding(dimens.pagePadding),
-            verticalArrangement = Arrangement.spacedBy(dimens.touchGap),
+            verticalArrangement = Arrangement.spacedBy(dimens.spaceRoomy),
         ) {
-            Text(
-                text = stringResource(R.string.settings_permission),
-                style = styles.pageTitle,
-                color = AppColors.TextPrimary,
-            )
 
-            Text(
+            StatusCard(
                 text = stringResource(
                     if (granted) R.string.help_permission_granted else R.string.help_no_permission,
                 ),
-                style = styles.body,
-                color = if (granted) AppColors.CallGreen else AppColors.DangerRed,
+                tone = if (granted) StatusTone.GOOD else StatusTone.DANGER,
+                icon = if (granted) Icons.Filled.Check else Icons.Filled.Warning,
             )
 
             if (!granted) {
+                Column(verticalArrangement = Arrangement.spacedBy(dimens.touchGap)) {
+                    Text(
+                        text = stringResource(R.string.help_permission_denied_hint),
+                        style = styles.caption,
+                        color = AppColors.TextSecondary,
+                    )
+                    FilledActionButton(
+                        text = stringResource(R.string.help_grant_call_permission),
+                        icon = Icons.Filled.Call,
+                        onClick = onRequestPermission,
+                    )
+                    FilledActionButton(
+                        text = stringResource(R.string.help_open_app_settings),
+                        icon = Icons.Filled.Settings,
+                        emphasis = false,
+                        onClick = { context.openAppSettingsPage() },
+                    )
+                }
+            }
+
+            SectionCard(title = stringResource(R.string.help_usage_title)) {
                 Text(
-                    text = stringResource(R.string.help_permission_denied_hint),
-                    style = styles.caption,
+                    text = stringResource(R.string.help_usage_steps),
+                    style = styles.body,
                     color = AppColors.TextSecondary,
-                )
-                PrimaryActionButton(
-                    text = stringResource(R.string.help_grant_call_permission),
-                    icon = Icons.Filled.Call,
-                    onClick = onRequestPermission,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                PrimaryActionButton(
-                    text = stringResource(R.string.help_open_app_settings),
-                    icon = Icons.Filled.Settings,
-                    onClick = { context.openAppSettingsPage() },
-                    modifier = Modifier.fillMaxWidth(),
                 )
             }
 
-            SectionTitle(stringResource(R.string.help_usage_title))
-            Text(
-                text = stringResource(R.string.help_usage_steps),
-                style = styles.body,
-                color = AppColors.TextSecondary,
-            )
-
-            SectionTitle(stringResource(R.string.help_notes_title))
-            Text(
-                text = stringResource(R.string.help_sim_note),
-                style = styles.body,
-                color = AppColors.TextSecondary,
-            )
-            Text(
-                text = stringResource(R.string.help_call_boundary),
-                style = styles.body,
-                color = AppColors.TextSecondary,
-            )
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimens.pagePadding),
-        ) {
-            BackActionButton(
-                text = stringResource(R.string.action_back),
-                icon = Icons.Filled.Info,
-                onClick = onBack,
-                modifier = Modifier.fillMaxWidth(),
-            )
+            SectionCard(title = stringResource(R.string.help_notes_title)) {
+                Column(verticalArrangement = Arrangement.spacedBy(dimens.spaceSnug)) {
+                    Text(
+                        text = stringResource(R.string.help_sim_note),
+                        style = styles.body,
+                        color = AppColors.TextSecondary,
+                    )
+                    Text(
+                        text = stringResource(R.string.help_call_boundary),
+                        style = styles.body,
+                        color = AppColors.TextSecondary,
+                    )
+                }
+            }
         }
     }
-}
-
-@Composable
-private fun SectionTitle(text: String) {
-    val styles = LocalAppTextStyles.current
-    val dimens = LocalAppDimens.current
-    Text(
-        text = text,
-        style = styles.contactName,
-        color = AppColors.TextPrimary,
-        modifier = Modifier.padding(top = dimens.touchGap),
-    )
 }

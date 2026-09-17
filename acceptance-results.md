@@ -1,8 +1,141 @@
 # Acceptance results
 
-Recorded: 2026-09-17. Every line states **what was actually run**, on which target, and
-what was **not** run. Status values are only 通过 (pass) / 失败 (fail) / 未验证 (not
-verified). Reproducing a build is not evidence that a real phone call works.
+Recorded: 2026-09-17, last updated 2026-09-18. Every line states **what was actually
+run**, on which target, and what was **not** run. Status values are only 通过 (pass) /
+失败 (fail) / 未验证 (not verified). Reproducing a build is not evidence that a real
+phone call works.
+
+## v1.0.5 release verification (2026-09-18)
+
+- Version `1.0.5` / version code `5`, signed with the SilverPhone release key
+  (certificate SHA-256 `DF:EA:77:...:52:F4`).
+- What changed since 1.0.2: the interface was rebuilt on Material 3 and the adaptive
+  layout system (see IMPLEMENTATION-NOTES.md), the standard text preset is now the
+  phone's ordinary scale, every pressable control answers a press, the home card is
+  photo-first, the family area is one list-detail destination, and bulk deletion was
+  added to the management screen (press and hold a card, tick more, one confirmation
+  for all of them).
+- `./gradlew testDebugUnitTest` — 通过 (104 tests, 0 failures).
+- `./gradlew connectedDebugAndroidTest` on `SilverPhone_API23` — 通过 (57 tests,
+  0 failures, 0 skipped). The six new tests cover the bulk delete transaction (photos
+  deleted with their contacts, order compacted, an empty selection refused) and the
+  management screen's selection flow (long press starts it, taps extend it, the
+  confirmation asks first, cancel keeps everyone).
+- `./gradlew lintDebug` — 通过 (0 errors).
+- `./gradlew assembleDebug assembleRelease` — 通过.
+- Manual pass on the emulator at 411 dp: long-press selection, the delete confirmation,
+  the contacts-import picker, the About screen, and the editor were each opened and
+  read at both the standard text size and system font scale 1.3.
+- 未验证: a real tablet or foldable (the two-pane layout was checked by resizing the
+  emulator display, not on tablet hardware); landscape; the 大 / 特大 / 超大 presets after
+  the type-scale change; a real phone call.
+
+## UI revision verification (2026-09-18)
+
+### Fourth pass: the owner's second round of screenshots
+
+- Release under test: `1.0.3` / version code `4` (the version now moves with each build
+  instead of being labelled by hand). Signed with the project's release key.
+- The import picker's rows were rebuilt as one compact line - tick, 48 dp face, name and
+  number, and a single trailing 修改 action - instead of a text column that also carried
+  two stacked buttons. Row height fell from roughly 140 dp to 72 dp.
+- The dialling-code screen now says what it is: the field is 自己填写区号 with a `+33`
+  example, and the five shortcuts sit under a 常用区号（点一下填进上面的输入框）label.
+- The About screen no longer shows the version code (`版本 1.0.3`, never `1.0.3 (4)`),
+  the project row carries the GitHub mark instead of a share glyph, and the update check
+  is a text action in the header row rather than a filled button.
+- The editor's photo block is stacked - face, then the button, then the hint - instead of
+  a tall preview beside a short button.
+- `./gradlew testDebugUnitTest` - 104 passed; `connectedDebugAndroidTest` on the API 23
+  emulator - 51 passed, 0 failed; `lintDebug` - 0 errors.
+- The release APK itself was installed on the emulator after uninstalling the older
+  release-signed build, and it launched.
+- Still 未验证: a real tablet or foldable, landscape, and the 大 / 特大 / 超大 presets after
+  the type-scale change.
+
+
+### Third pass: alignment, header rhythm and the fluorescent colour
+
+- Every family screen now wears the same header: a one-line `TopAppBar` plus a muted
+  description directly under it, and both panes of the settings scaffold therefore
+  start their content on the same line.
+- Measured, not eyeballed: with the emulator set to 2160x1600 @ 240 dpi
+  (1440 x 1067 dp, an *expanded* width) and the family area showing the menu beside
+  the text-size section, `uiautomator dump` reports the list pane's subtitle and the
+  detail pane's subtitle at the same top edge, y=171, and both pane titles at y=93.
+  Before this pass the two content columns started a whole line apart.
+- The fluorescent yellow-green is gone from the interface. It survives in exactly one
+  place, the launcher icon, and `AppColors.BrandLime` is no longer read from anywhere
+  under `ui/`; the Material colour scheme's `primaryContainer` was pointing at it and
+  now points at the neutral tint, so no framework component can paint itself in it.
+- See `design/verification/2026-09-18/09`..`11` for the final home screen, the
+  preferences screen and the aligned two-pane layout.
+- A physical Android 16 device joined the connected-test run and produced two failures
+  that the API 23 emulator does not: `BackupRoundTripTest.aParentTraversalEntryNameIsRejected`
+  (expected `UNSAFE_ENTRY_NAME`, got `NOT_A_ZIP` - on API 36 the archive is refused when
+  it is opened, so the malicious file is still rejected, only with a different reason),
+  and a crash of the instrumentation process during
+  `ManageSearchFocusTest.theActionBarSurvivesAQueryThatMatchesNothing`, which ended that
+  device's run at 37 of 51 tests. Both are 未验证/未修复: the device disconnected before
+  its logcat could be read, and API 28-36 were never a target for this project. The
+  suite was re-run against the API 23 emulator alone afterwards: 51 passed, 0 failed.
+
+### Adaptive layout rebuild (second pass, same day)
+
+- What changed: the whole interface was rebuilt on the canonical adaptive layout
+  system. The navigation graph went from eleven destinations to three (`home`,
+  `family`, `editor`); the family area is now one `ListDetailPaneScaffold` whose list
+  pane is the family menu and whose detail pane is the section behind it; every screen
+  uses a Material 3 `Scaffold` + `TopAppBar` and takes its insets from that scaffold;
+  the home screen is a `LazyVerticalGrid`; content is capped at a 600 dp measure.
+  Motion was added where it carries meaning: pane transitions, destination
+  transitions, a crossfade between the home screen's states, animated list placement,
+  and the press feedback described above.
+- `./gradlew testDebugUnitTest` — 通过 (104 tests, 0 failures).
+- `./gradlew connectedDebugAndroidTest` on `SilverPhone_API23` — 通过
+  (51 tests, 0 failures, 0 skipped).
+- `./gradlew lintDebug` — 通过 (0 errors).
+- Compact window, 1080x1920 @ 420 dpi (411 dp): home, family menu, manage contacts,
+  add/edit contact, text size, language and dialling code, calling permission, About
+  were each opened on the emulator with the rebuilt layout, and one contact was opened
+  in the editor from the management pane.
+- Two-pane layout: the emulator display was resized to 2400x1600 @ 240 dpi
+  (1000 x 666 dp, an *expanded* width) with `adb shell wm size` / `wm density`. The
+  family menu stayed on the left with the open row marked as selected, the section
+  rendered beside it without a back arrow, and the empty detail pane explained itself.
+  The display was reset afterwards (`wm size reset`, `wm density reset`).
+- 未验证: a real tablet, a foldable, or the Medium window class on a physical device;
+  landscape on a phone; the 大 / 特大 / 超大 presets re-checked after the type-scale
+  change. The two-pane result above is a resized phone emulator, not a tablet.
+- Screenshots of that pass are in `design/verification/2026-09-18/` (compact home,
+  compact family menu, a section in the detail pane, the editor modal, and the
+  two-pane family area at an expanded width).
+
+- Version under test: `1.0.2` / version code `3`, debug build
+  (`com.silverphone.app.debug`), installed on the API 23 arm64 emulator.
+- What changed: the visual system (Material 3 shape, type and elevation tokens; see
+  IMPLEMENTATION-NOTES.md), explicit press feedback on every pressable control, the
+  standard text preset reduced to the phone's ordinary scale, and the home card
+  rebuilt as a photo-first card.
+- `./gradlew testDebugUnitTest` — 通过 (104 tests, 0 failures).
+- `./gradlew connectedDebugAndroidTest` on `SilverPhone_API23` — 通过
+  (51 tests, 0 failures, 0 skipped), including the home screen's dial contract (one
+  tap, one request; the dial area is at least 64 dp tall and 120 dp wide) and the
+  management screen's focus and action-bar behaviour.
+- `./gradlew installDebug` on the same emulator — 通过.
+- Manual walkthrough at 1080x1920 @ 420 dpi (= 411 dp wide), portrait, system font
+  scale 1.0, app preset 标准: home, family settings, manage contacts, add/edit
+  contact, text size, language and dialling code, calling permission, About, transfer.
+  The dial area and a settings row were photographed **while held**, and both show the
+  pressed fill and the reduced size.
+- 未验证: a real phone; landscape; 320 dp and 360 dp widths; system font 1.3 and 2.0;
+  the 大 / 特大 / 超大 presets after the base sizes changed; the system contacts import
+  against a real address book. No call was placed: the emulator has no telephony, so
+  the dial contract is still evidenced only by the recording host double in the
+  instrumented tests.
+- The images in `design/screenshots/` and `design/hero/` were produced before this
+  revision and therefore still show the previous interface. They are stale: they need
+  to be regenerated before the next release.
 
 ## v1.0.1 release verification (2026-09-17)
 

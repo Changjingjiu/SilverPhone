@@ -1,6 +1,7 @@
 package com.silverphone.app.ui.contacts
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,9 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -31,10 +30,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.silverphone.app.R
 import com.silverphone.app.domain.ContactLimits
-import com.silverphone.app.ui.components.BackActionButton
-import com.silverphone.app.ui.components.CancelActionButton
+import com.silverphone.app.ui.components.FamilyScreen
+import com.silverphone.app.ui.components.FilledActionButton
 import com.silverphone.app.ui.components.MessageState
-import com.silverphone.app.ui.components.PrimaryActionButton
+import com.silverphone.app.ui.components.SectionCard
 import com.silverphone.app.ui.theme.AppColors
 import com.silverphone.app.ui.theme.LocalAppDimens
 import com.silverphone.app.ui.theme.LocalAppTextStyles
@@ -79,22 +78,13 @@ fun ContactsImportScreen(
     val dimens = LocalAppDimens.current
     val styles = LocalAppTextStyles.current
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(AppColors.Background)
-            .windowInsetsPadding(WindowInsets.safeDrawing),
+    FamilyScreen(
+        title = stringResource(R.string.contacts_title),
+        subtitle = stringResource(R.string.settings_import_contacts_desc),
+        onBack = onBack,
+        backLabel = stringResource(R.string.action_back),
+        modifier = modifier.fillMaxSize(),
     ) {
-        Text(
-            text = stringResource(R.string.contacts_title),
-            style = styles.pageTitle,
-            color = AppColors.TextPrimary,
-            modifier = Modifier.padding(
-                start = dimens.pagePadding,
-                end = dimens.pagePadding,
-                top = dimens.pagePadding,
-            ),
-        )
 
         // The content takes the space that is left AFTER the action bar, rather than
         // claiming everything and collapsing the bar to zero height. Without the
@@ -149,51 +139,50 @@ fun ContactsImportScreen(
         // Every state except the final result gets an explicit way back. The
         // permission and loading states used to offer only the system back gesture,
         // which is exactly what this app must not rely on.
-        if (state.step != ContactsStep.DONE) {
+        if (state.step != ContactsStep.DONE &&
+            state.permission == ContactsPermission.GRANTED
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(dimens.pagePadding),
-                verticalArrangement = Arrangement.spacedBy(dimens.touchGap),
+                    .padding(horizontal = dimens.pagePadding, vertical = dimens.touchGap),
             ) {
                 if (state.committing) {
                     Text(
                         text = stringResource(R.string.contacts_importing),
                         style = styles.caption,
                         color = AppColors.TextSecondary,
+                        modifier = Modifier.padding(bottom = dimens.spaceSnug),
                     )
                 }
-                if (state.permission == ContactsPermission.GRANTED) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(dimens.touchGap),
+                ) {
                     if (state.step == ContactsStep.PICK) {
-                        PrimaryActionButton(
+                        FilledActionButton(
                             text = stringResource(R.string.contacts_next),
                             icon = Icons.Filled.Check,
                             enabled = state.selectedCount > 0,
                             onClick = onGoToPreview,
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.weight(1f),
                         )
                     } else {
-                        PrimaryActionButton(
+                        FilledActionButton(
                             text = stringResource(R.string.contacts_import),
                             icon = Icons.Filled.Check,
                             enabled = state.canSubmit,
                             onClick = onCommit,
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.weight(1f),
                         )
-                        BackActionButton(
+                        FilledActionButton(
                             text = stringResource(R.string.contacts_back_to_pick),
-                            icon = Icons.AutoMirrored.Filled.ArrowBack,
+                            emphasis = false,
                             onClick = onBackToPick,
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.weight(1f),
                         )
                     }
                 }
-                CancelActionButton(
-                    text = stringResource(R.string.action_cancel),
-                    icon = Icons.Filled.Clear,
-                    onClick = onBack,
-                    modifier = Modifier.fillMaxWidth(),
-                )
             }
         }
     }
@@ -245,36 +234,37 @@ private fun PreviewBody(
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         item {
-            Text(
-                text = stringResource(R.string.contacts_preview_title),
-                style = styles.body,
-                color = AppColors.TextPrimary,
-            )
-        }
-        item {
-            Text(
-                text = stringResource(R.string.contacts_preview_new, counts.toAdd),
-                style = styles.body,
-                color = AppColors.TextPrimary,
-            )
-        }
-        item {
-            Text(
-                text = stringResource(R.string.contacts_preview_skipped, counts.skippedExisting),
-                style = styles.caption,
-                color = AppColors.TextSecondary,
-            )
-        }
-        if (counts.missingPhoto > 0) {
-            item {
-                Text(
-                    text = stringResource(
-                        R.string.contacts_preview_missing_photo,
-                        counts.missingPhoto,
-                    ),
-                    style = styles.caption,
-                    color = AppColors.TextSecondary,
-                )
+            SectionCard {
+                Column(verticalArrangement = Arrangement.spacedBy(dimens.spaceSnug)) {
+                    Text(
+                        text = stringResource(R.string.contacts_preview_title),
+                        style = styles.section,
+                        color = AppColors.TextSecondary,
+                    )
+                    Text(
+                        text = stringResource(R.string.contacts_preview_new, counts.toAdd),
+                        style = styles.button,
+                        color = AppColors.TextPrimary,
+                    )
+                    Text(
+                        text = stringResource(
+                            R.string.contacts_preview_skipped,
+                            counts.skippedExisting,
+                        ),
+                        style = styles.caption,
+                        color = AppColors.TextSecondary,
+                    )
+                    if (counts.missingPhoto > 0) {
+                        Text(
+                            text = stringResource(
+                                R.string.contacts_preview_missing_photo,
+                                counts.missingPhoto,
+                            ),
+                            style = styles.caption,
+                            color = AppColors.TextSecondary,
+                        )
+                    }
+                }
             }
         }
         if (counts.needsFix > 0) {
@@ -319,12 +309,17 @@ private fun PreviewBody(
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(dimens.cardCorner))
                     .background(AppColors.Surface)
+                    .border(
+                        1.dp,
+                        AppColors.Hairline,
+                        RoundedCornerShape(dimens.cardCorner),
+                    )
                     .padding(dimens.cardInnerPadding),
             ) {
                 Column {
                     Text(
                         text = candidate.effectiveName,
-                        style = styles.body,
+                        style = styles.button,
                         color = AppColors.TextPrimary,
                     )
                     Text(
@@ -391,11 +386,10 @@ private fun DoneBody(state: ContactsImportUiState, onFinished: () -> Unit) {
                 color = AppColors.DangerRed,
             )
         }
-        PrimaryActionButton(
+        FilledActionButton(
             text = stringResource(R.string.action_confirm),
             icon = Icons.Filled.Check,
             onClick = onFinished,
-            modifier = Modifier.fillMaxWidth(),
         )
     }
 }

@@ -1,26 +1,35 @@
 package com.silverphone.app.ui.components
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.unit.dp
 import com.silverphone.app.ui.theme.AppColors
 import com.silverphone.app.ui.theme.LocalAppDimens
@@ -33,7 +42,15 @@ import com.silverphone.app.ui.theme.LocalAppTextStyles
  * stay distinguishable in grayscale and without reading: a red outlined cross
  * cancels, a red solid bin deletes, and a dark-blue solid tick saves or enters.
  * The green call area inside a contact card is drawn by the card itself.
+ *
+ * They are built on one pressable surface rather than on the Material button, because
+ * a button has to answer the finger: it darkens, it sinks, it gives a short tick, and
+ * it springs back when the finger leaves. Material's button only tints the fill by a
+ * few percent, which is invisible on the dark fills this app uses.
  */
+
+/** Long enough to be seen while the finger is down, short enough to feel immediate. */
+private const val PRESS_FILL_MILLIS = 90
 
 /** Solid dark blue: save, import, enter settings. */
 @Composable
@@ -44,84 +61,25 @@ fun PrimaryActionButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) {
-    val dimens = LocalAppDimens.current
-    Button(
+    ActionButton(
+        text = text,
+        icon = icon,
         onClick = onClick,
+        modifier = modifier,
         enabled = enabled,
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = dimens.primaryButtonHeight),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = AppColors.Ink,
-            contentColor = Color.White,
-            disabledContainerColor = AppColors.DisabledSurface,
-            disabledContentColor = AppColors.DisabledOnSurface,
-        ),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(dimens.cardCorner),
-    ) {
-        ActionContent(text = text, icon = icon)
-    }
+        container = AppColors.Ink,
+        containerPressed = AppColors.InkPressed,
+        content = Color.White,
+    )
 }
 
-/** Solid red, destructive: delete, replace everything. Always confirms first. */
-@Composable
-fun DangerActionButton(
-    text: String,
-    icon: ImageVector,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-) {
-    val dimens = LocalAppDimens.current
-    Button(
-        onClick = onClick,
-        enabled = enabled,
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = dimens.primaryButtonHeight),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = AppColors.DangerRed,
-            contentColor = Color.White,
-            disabledContainerColor = AppColors.DisabledSurface,
-            disabledContentColor = AppColors.DisabledOnSurface,
-        ),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(dimens.cardCorner),
-    ) {
-        ActionContent(text = text, icon = icon)
-    }
-}
-
-/** Red outline: cancel, which keeps the data as it was. */
-@Composable
-fun CancelActionButton(
-    text: String,
-    icon: ImageVector,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-) {
-    val dimens = LocalAppDimens.current
-    OutlinedButton(
-        onClick = onClick,
-        enabled = enabled,
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = dimens.primaryButtonHeight),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(dimens.cardCorner),
-        border = androidx.compose.foundation.BorderStroke(
-            width = 2.dp,
-            color = if (enabled) AppColors.CancelRed else AppColors.DisabledOnSurface,
-        ),
-        colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = AppColors.CancelRed,
-            disabledContentColor = AppColors.TextSecondary,
-        ),
-    ) {
-        ActionContent(text = text, icon = icon)
-    }
-}
-
-/** Dark blue outline: go back up one level. Never destructive. */
+/**
+ * Dark blue, quietly filled: go back up one level. Never destructive.
+ *
+ * Softer than the solid buttons on purpose. A back action is on almost every screen,
+ * and drawing it as a full-strength outlined block made the way out the loudest thing
+ * on the page. The arrow and the word still carry the meaning in greyscale.
+ */
 @Composable
 fun BackActionButton(
     text: String,
@@ -129,18 +87,17 @@ fun BackActionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val dimens = LocalAppDimens.current
-    OutlinedButton(
+    ActionButton(
+        text = text,
+        icon = icon,
         onClick = onClick,
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = dimens.primaryButtonHeight),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(dimens.cardCorner),
-        border = androidx.compose.foundation.BorderStroke(width = 2.dp, color = AppColors.Ink),
-        colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColors.Ink),
-    ) {
-        ActionContent(text = text, icon = icon)
-    }
+        modifier = modifier,
+        enabled = true,
+        container = AppColors.SurfaceSunken,
+        containerPressed = AppColors.InkSoft,
+        content = AppColors.Ink,
+        height = LocalAppDimens.current.secondaryButtonHeight,
+    )
 }
 
 /**
@@ -166,28 +123,50 @@ fun CompactActionButton(
         danger -> AppColors.DangerRed
         else -> AppColors.Ink
     }
+    val pressedFill = if (danger) AppColors.DangerSoft else AppColors.InkSoft
+    // A chip, not a stadium: three of these share one row, and three full-round
+    // outlines read as decoration rather than as three quiet controls.
+    val shape = RoundedCornerShape(dimens.chipCorner)
 
-    OutlinedButton(
-        onClick = onClick,
-        enabled = enabled,
-        modifier = modifier.heightIn(min = dimens.minTouchTarget),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
-        border = androidx.compose.foundation.BorderStroke(
-            width = 1.dp,
-            color = if (enabled) contentColor else AppColors.DisabledOnSurface,
-        ),
-        colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = contentColor,
-            disabledContentColor = AppColors.DisabledOnSurface,
-        ),
-        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+    val interactionSource = remember { MutableInteractionSource() }
+    val press = rememberPressFeedback(interactionSource)
+    PressHaptics(interactionSource, enabled = enabled)
+    val fill by animateColorAsState(
+        targetValue = when {
+            !enabled -> AppColors.DisabledSurface
+            press.pressed -> pressedFill
+            else -> AppColors.Surface
+        },
+        animationSpec = tween(PRESS_FILL_MILLIS),
+        label = "compactFill",
+    )
+
+    Row(
+        modifier = modifier
+            .pressScale(press.scale)
+            // The compact controls only appear on the family's screens, which are laid
+            // out like any other app rather than around a large touch target.
+            .heightIn(min = 44.dp)
+            .clip(shape)
+            .background(fill)
+            .border(1.dp, contentColor, shape)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = ripple(color = contentColor),
+                enabled = enabled,
+                role = Role.Button,
+                onClick = onClick,
+            )
+            .padding(PaddingValues(horizontal = 8.dp, vertical = 4.dp)),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
             tint = contentColor,
             modifier = Modifier
-                .size(24.dp)
+                .size(dimens.secondaryGlyph)
                 .clearAndSetSemantics { },
         )
         Text(
@@ -202,32 +181,89 @@ fun CompactActionButton(
     }
 }
 
+/** The one implementation behind every full-width button. */
 @Composable
-private fun ActionContent(text: String, icon: ImageVector) {
+private fun ActionButton(
+    text: String,
+    icon: ImageVector,
+    onClick: () -> Unit,
+    modifier: Modifier,
+    enabled: Boolean,
+    container: Color,
+    containerPressed: Color,
+    content: Color,
+    border: Color? = null,
+    height: androidx.compose.ui.unit.Dp? = null,
+) {
     val dimens = LocalAppDimens.current
+    val minHeight = height ?: dimens.primaryButtonHeight
+    val shape = RoundedCornerShape(percent = 50)
+    val interactionSource = remember { MutableInteractionSource() }
+    val press = rememberPressFeedback(interactionSource)
+    PressHaptics(interactionSource, enabled = enabled)
+
+    val fill by animateColorAsState(
+        targetValue = when {
+            !enabled -> AppColors.DisabledSurface
+            press.pressed -> containerPressed
+            else -> container
+        },
+        animationSpec = tween(PRESS_FILL_MILLIS),
+        label = "actionFill",
+    )
+    val labelColor = if (enabled) content else AppColors.DisabledOnSurface
+    // A button sits a little above the page and flattens onto it while it is held,
+    // which is the half of the feedback that the colour alone cannot carry.
+    val elevation by animateDpAsState(
+        targetValue = if (enabled && !press.pressed) 2.dp else 0.dp,
+        animationSpec = tween(PRESS_FILL_MILLIS),
+        label = "actionElevation",
+    )
+
     Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .pressScale(press.scale)
+            .shadow(elevation, shape)
+            .clip(shape)
+            .background(fill)
+            .then(
+                if (border == null) {
+                    Modifier
+                } else {
+                    Modifier.border(
+                        2.dp,
+                        if (enabled) border else AppColors.DisabledOnSurface,
+                        shape,
+                    )
+                },
+            )
+            .clickable(
+                interactionSource = interactionSource,
+                indication = ripple(color = labelColor),
+                enabled = enabled,
+                role = Role.Button,
+                onClick = onClick,
+            )
+            .heightIn(min = minHeight)
+            .padding(horizontal = dimens.cardInnerPadding, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .fillMaxWidth()
-            .defaultMinSize(minHeight = dimens.minTouchTarget)
-            .padding(vertical = 8.dp),
     ) {
         Icon(
             imageVector = icon,
             // Decorative: the button's own label already carries the meaning.
             contentDescription = null,
             modifier = Modifier
-                .size(dimens.primaryGlyph)
+                .size(dimens.buttonGlyph)
                 .clearAndSetSemantics { },
-            tint = androidx.compose.material3.LocalContentColor.current,
+            tint = labelColor,
         )
         Text(
             text = text,
             style = LocalAppTextStyles.current.button,
-            modifier = Modifier
-                .padding(start = dimens.touchGap)
-                .weight(1f, fill = false),
+            color = labelColor,
+            modifier = Modifier.padding(start = dimens.touchGap),
         )
     }
 }

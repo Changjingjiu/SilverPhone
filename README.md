@@ -32,6 +32,10 @@
 - **Four text sizes** for the whole app, with a real card preview before saving.
 - **English or Chinese**, and any country's dialling code.
 - **One file moves everyone to a second phone** — names, numbers, order and photos — and the receiving phone previews the file before it imports anything.
+- **Press and hold a card to delete several relatives at once**, with a confirmation that names how many will go.
+- **Two apps in one.** The call screen is built around the person using it; every family screen is an ordinary Android app, with a compact bar, one-line rows and no oversized buttons.
+- **Adapts to the screen it is on.** On a phone the family menu opens one screen at a time; on a tablet or a foldable the menu stays beside the screen it opened (Material 3 `ListDetailPaneScaffold`, window size classes rather than device checks).
+- **Every tap answers back**: pressed controls darken, shrink and spring, with a short tick.
 - **No account, no ads, no analytics.** The app's only network request is the manual "check for updates".
 
 ## Getting started
@@ -79,7 +83,7 @@ More screens, both languages, in [`design/screenshots/`](design/screenshots).
 - **It uses the phone's own dialler.** Dual SIM, call waiting, speakerphone, the call log: all of it behaves exactly as it does for any other call.
 - **The same list can be handed to a second phone**, so two elderly parents can each have one.
 - **No account and no server.** Contacts, photos and settings stay in the app's private storage.
-- **Small and current**: 2.7 MB, Android 6.0 (API 23) and up.
+- **Small and current**: 2.7 MB, Android 6.0 (API 23) and up, and the interface follows Material 3's shape, type and motion guidance.
 
 ## Reference and scope
 
@@ -88,7 +92,7 @@ More screens, both languages, in [`design/screenshots/`](design/screenshots).
 | Requirements | Android 6.0+ (API 23). No Google services, no account. |
 | Permissions | `CALL_PHONE`, `READ_CONTACTS` — each asked for at the moment it is used — and `INTERNET`, used only by the manual update check. |
 | Build | JDK 17 and Android SDK 36. `./gradlew assembleDebug` |
-| Tests | `./gradlew testDebugUnitTest` (104) · `./gradlew connectedDebugAndroidTest` (51) |
+| Tests | `./gradlew testDebugUnitTest` (104) · `./gradlew connectedDebugAndroidTest` (57) |
 | Documents | [docs/spec](docs/spec) — the four specification documents · [IMPLEMENTATION-NOTES.md](IMPLEMENTATION-NOTES.md) · [acceptance-results.md](acceptance-results.md) · [build-matrix.md](build-matrix.md) · [docs/RELEASING.md](docs/RELEASING.md) · [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) |
 
 **Not built on purpose:** accounts, sync, servers, cloud backup, analytics, ads, crash reporting; app-store publishing; video calls; messaging; multiple profiles; a call log; a dial pad; calling from the lock screen.
