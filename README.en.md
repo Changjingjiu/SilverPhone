@@ -31,7 +31,7 @@ replacement, and not a communication platform: it is the shortest possible path 
 photo, name, number — and the person using it only ever has to recognise a face and
 press one button.
 
-The app was built against four specification documents (`00`–`04` in the project root)
+The app was built against four specification documents (`00`–`04` in [`docs/spec/`](docs/spec))
 that fix the interface flow, the logic, the features, the technology, and the
 accessibility rules. Where this README describes a decision that departs from those
 documents, [IMPLEMENTATION-NOTES.md](IMPLEMENTATION-NOTES.md) records what was decided
