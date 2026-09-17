@@ -79,27 +79,20 @@ jobs:
           name: silverphone-release-apk
           path: apks
 
-      - name: Download the debug APK
-        uses: actions/download-artifact@v8
-        with:
-          name: silverphone-debug-apk
-          path: apks
-
+      # One asset, the release APK. The debug APK stays in the build job's artifacts:
+      # a release page is what a family downloads from, and a second package there
+      # only asks them to pick the wrong file.
       - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}
-          # This job has no checkout, so gh is told which repository it is working
-          # on instead of reading that from a git remote that is not there.
           GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
           version="${GITHUB_REF_NAME}"
           cp apks/app-release.apk "SilverPhone-${version}.apk"
-          cp apks/app-debug.apk "SilverPhone-${version}-debug.apk"
           gh release create "${version}" \
             "SilverPhone-${version}.apk" \
-            "SilverPhone-${version}-debug.apk" \
             --verify-tag \
             --title "SilverPhone ${version}" \
-            --notes "Installs over an older SilverPhone build only if it was signed with the same key. Both APKs here are signed with the Android debug key, so they are test builds: uninstall the app before installing one, or sign future releases with the same key. See docs/RELEASING.md." \
+            --notes "Installs over an older SilverPhone build only if that build was signed with the same key. This APK is signed with the Android debug key, so it is a test build: uninstall the app before installing it, or sign future releases with the same key. See docs/RELEASING.md." \
             --generate-notes

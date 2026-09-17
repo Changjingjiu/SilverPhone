@@ -305,7 +305,7 @@ The published release:
 | Item | Value |
 |---|---|
 | Release | `v1.0.0`, marked Latest, published 2026-09-17 |
-| Assets | `SilverPhone-v1.0.0.apk` (2,694,130 bytes) and `SilverPhone-v1.0.0-debug.apk` — both signed with a debug key, so both are test builds |
+| Asset | `SilverPhone-v1.0.0.apk` (2,694,130 bytes), signed with a debug key, so a test build. The debug APK was published with it at first and was then removed on the owner's instruction: a release page should carry one file, and the debug build stays in the run's artifacts. |
 | What the app reads | `GET https://api.github.com/repos/Changjingjiu/SilverPhone/releases/latest` → `tag_name: v1.0.0`, `html_url: .../releases/tag/v1.0.0` |
 
 #### The update check, end to end, on the emulator

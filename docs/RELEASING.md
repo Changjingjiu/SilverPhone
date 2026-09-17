@@ -15,7 +15,9 @@ versionName = "1.0.1"  // the number the About screen shows and compares
 
 ## 2. Make the documents true again
 
-- `README.md` and `README.zh-CN.md`: feature list, permissions, test counts.
+- `README.md` (Chinese, the default) and `README.en.md` (English): feature list,
+  permissions, test counts. Both are written in their own language; neither is a
+  translation of the other.
 - `docs/spec/05_设计规格.md`: the acceptance-case list, if behaviour changed.
 - `IMPLEMENTATION-NOTES.md`: anything that departs from `docs/spec/00`–`04`.
 
@@ -41,14 +43,17 @@ git push origin v1.0.1
 
 ## 5. What CI does with the tag
 
-`.github/workflows/android.yml` builds and tests the tag, uploads both APKs as workflow
+`.github/workflows/android.yml` builds and tests the tag, keeps both APKs as workflow
 artifacts (`silverphone-release-apk`, `silverphone-debug-apk`), and then publishes a
-GitHub release named `v1.0.1` with:
+GitHub release named `v1.0.1` with exactly one file:
 
 | Asset | Source |
 |---|---|
 | `SilverPhone-v1.0.1.apk` | `app/build/outputs/apk/release/app-release.apk` |
-| `SilverPhone-v1.0.1-debug.apk` | `app/build/outputs/apk/debug/app-debug.apk` |
+
+The debug APK is deliberately **not** published: a release page is what a family
+downloads from, and a second, similarly named package there only invites the wrong
+choice. Take the debug build from the run's artifacts when it is needed for testing.
 
 The release notes are generated from the commits since the previous tag.
 
