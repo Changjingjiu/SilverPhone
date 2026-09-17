@@ -66,6 +66,13 @@ jobs:
     permissions:
       contents: write
     steps:
+      # gh --generate-notes reads the commit history between tags, so this job
+      # needs the repository itself, with the tags, not just the artifacts.
+      - name: Check out
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
       - name: Download the release APK
         uses: actions/download-artifact@v8
         with:
@@ -81,6 +88,9 @@ jobs:
       - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}
+          # This job has no checkout, so gh is told which repository it is working
+          # on instead of reading that from a git remote that is not there.
+          GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
           version="${GITHUB_REF_NAME}"
@@ -89,6 +99,7 @@ jobs:
           gh release create "${version}" \
             "SilverPhone-${version}.apk" \
             "SilverPhone-${version}-debug.apk" \
+            --verify-tag \
             --title "SilverPhone ${version}" \
             --notes "Installs over an older SilverPhone build only if it was signed with the same key. Both APKs here are signed with the Android debug key, so they are test builds: uninstall the app before installing one, or sign future releases with the same key. See docs/RELEASING.md." \
             --generate-notes
