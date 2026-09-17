@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Replaces the file the crop library ships, which maps its provider onto the whole of
+  cacheDir, the whole private files dir and the external files dir.
+
+  This app never hands out one of that provider's URIs: the crop screen passes saveUri
+  = null, so the library writes nothing and shares nothing. Overriding the mapping here
+  means that even if some future call did create such a URI, the provider would have
+  nothing to serve - the export archives and the import staging area, which between them
+  hold every relative's name, number and photo, are not reachable through it.
+-->
+<paths />

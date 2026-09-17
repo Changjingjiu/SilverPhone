@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  FileProvider paths. Only the exports/ sub-directory of the cache is shared, so a
+  granted URI can never reach the database, the import staging area, photo drafts
+  or the rest of the cache.
+-->
+<paths>
+    <cache-path
+        name="exports"
+        path="exports/" />
+</paths>

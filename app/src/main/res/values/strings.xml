@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  English copy, and the default: a device set to a language this app does not ship
+  falls back to English rather than to Chinese. Chinese lives in values-zh.
+  The family can also pin a language in the app's own settings.
+-->
+<resources>
+
+    <string name="app_name">SilverPhone</string>
+
+    <!-- ============ S01 home ============ -->
+    <string name="home_title">Make a call</string>
+    <string name="home_family_entry">Family settings</string>
+    <string name="home_call_badge">Call</string>
+    <!-- Spoken label for one call button, e.g. "Call Daughter". -->
+    <string name="home_call_semantics">Call %1$s</string>
+    <string name="home_loading">Loading your family…</string>
+    <string name="home_load_failed">Cannot read the contacts at the moment</string>
+    <string name="home_load_failed_hint">Tap "Try again", or ask a family member to take a look.</string>
+    <string name="home_retry">Try again</string>
+    <string name="home_empty_title">Ask a family member to add someone</string>
+    <string name="home_empty_hint">Once a family member adds a photo, a name and a number, that person appears here.</string>
+    <string name="home_empty_action">Family settings</string>
+    <string name="home_handing_off">Opening the phone app</string>
+
+    <!-- ============ S03 family settings ============ -->
+    <string name="settings_title">Family settings</string>
+    <string name="settings_manage">Manage contacts</string>
+    <string name="settings_manage_desc">Add, edit, delete and reorder</string>
+    <string name="settings_import_contacts">Import from this phone\'s contacts</string>
+    <string name="settings_import_contacts_desc">Read this phone\'s address book and pick the people to add</string>
+    <string name="settings_transfer">Import or export</string>
+    <string name="settings_transfer_desc">Move contacts to or from another phone using one file</string>
+    <string name="transfer_title">Import or export</string>
+    <string name="transfer_subtitle">Both sides use the same kind of file: one phone exports it, another imports it.</string>
+    <string name="settings_import_file">Import from a file</string>
+    <string name="settings_import_file_desc">Read the ZIP file exported by another phone</string>
+    <string name="settings_export">Export contacts</string>
+    <string name="settings_export_desc">Build one file containing the photos, to hand to another phone</string>
+    <string name="settings_font">Text size</string>
+    <string name="settings_font_desc">Change the text size across the app</string>
+    <string name="settings_preferences">Language &amp; dialling code</string>
+    <string name="settings_preferences_desc">Switch the interface language and set the dialling prefix</string>
+    <string name="settings_permission">Calling permission &amp; how to use</string>
+    <string name="settings_permission_desc">How calls are placed, and common questions</string>
+    <string name="settings_back_home">Back to the call screen</string>
+    <string name="settings_count">%1$d contacts at the moment</string>
+
+    <!-- ============ S12 language and dialling code ============ -->
+    <string name="preferences_title">Language &amp; dialling code</string>
+    <string name="preferences_language_title">Interface language</string>
+    <string name="preferences_language_system">Same as the system</string>
+    <string name="preferences_language_note">Changing this switches the whole app immediately. The system phone app and system dialogs are not affected.</string>
+    <string name="preferences_country_title">Dialling code</string>
+    <string name="preferences_country_note">Numbers stored without a country code get this one added when they are dialled. A number that already starts with + is left exactly as it is.</string>
+    <string name="preferences_country_short_note">Short service numbers such as 110 or 10086 are dialled as they are, with no code added. A number written with a leading 0 - a landline, say 01012345678 - is dialled as +86 10 1234 5678: the 0 belongs to the old country, and the dialling code replaces it.</string>
+    <string name="preferences_country_none">Add nothing</string>
+    <string name="preferences_country_custom">Another code</string>
+    <string name="preferences_country_custom_hint">For example: +1</string>
+    <string name="preferences_country_invalid">That code is not the right shape. It should be a + followed by 1 to 4 digits.</string>
+    <string name="preferences_country_example">Will dial: %1$s</string>
+    <string name="preferences_save">Save</string>
+    <string name="preferences_save_failed">The phone could not save this. Please try again.</string>
+    <string name="preferences_cancel">Cancel</string>
+    <string name="preferences_saved">Saved</string>
+
+    <!-- ============ S04 manage contacts ============ -->
+    <string name="manage_title">Manage contacts</string>
+    <string name="manage_search_hint">Search by name or number</string>
+    <string name="manage_search_clear">Clear the search</string>
+    <string name="manage_add">Add a contact</string>
+    <string name="manage_move_up">Up</string>
+    <string name="manage_move_down">Down</string>
+    <string name="manage_edit">Edit</string>
+    <string name="manage_empty">No contacts yet. Tap "Add a contact" below to start.</string>
+    <string name="manage_search_empty">Nobody matches that search</string>
+    <string name="manage_no_photo">No photo yet</string>
+    <string name="manage_capacity">%1$d contacts, which is the limit</string>
+
+    <!-- ============ S05 add / edit a contact ============ -->
+    <string name="editor_add_title">Add a contact</string>
+    <string name="editor_edit_title">Edit contact</string>
+    <string name="editor_choose_photo">Choose a photo</string>
+    <string name="editor_change_photo">Change the photo</string>
+    <string name="editor_remove_photo">Remove the photo</string>
+    <string name="editor_photo_missing">No photo yet. A clear, straight-on face works best.</string>
+    <string name="editor_name_label">What the elderly user calls this person</string>
+    <string name="editor_name_hint">For example: Daughter, Mum, Jamie</string>
+    <string name="editor_name_example">12 characters at most</string>
+    <string name="editor_phone_label">Phone number</string>
+    <string name="editor_phone_hint">For example: 555 0134</string>
+    <string name="editor_phone_format_hint">Mobile or landline; a leading + is allowed</string>
+    <string name="editor_dial_preview">Will dial %1$s</string>
+    <string name="editor_placeholder_label">Colour used with no photo</string>
+    <string name="placeholder_light_blue">Light blue</string>
+    <string name="placeholder_light_amber">Light amber</string>
+    <string name="placeholder_light_purple">Light purple</string>
+    <string name="placeholder_light_teal">Light teal</string>
+    <string name="placeholder_light_rose">Light rose</string>
+    <string name="placeholder_light_gray">Light grey</string>
+    <string name="editor_save">Save</string>
+    <string name="editor_cancel">Cancel</string>
+    <string name="editor_saving">Saving, please wait</string>
+    <string name="editor_delete">Delete this contact</string>
+    <string name="editor_delete_confirm_title">Delete this contact?</string>
+    <string name="editor_delete_confirm_message">The photo is deleted with the contact, and this cannot be undone.</string>
+    <string name="editor_delete_confirm_action">Delete</string>
+    <string name="editor_discard_title">Discard these changes?</string>
+    <string name="editor_discard_message">Anything not saved will be lost.</string>
+    <string name="editor_discard_confirm">Discard</string>
+    <string name="editor_keep_editing">Keep editing</string>
+    <string name="editor_same_number">Another contact already uses this number. You can still save, for example two people sharing one landline.</string>
+    <string name="editor_same_name">Another contact uses the same name. A photo or a different name will help tell them apart.</string>
+    <string name="editor_name_required">Please enter a name</string>
+    <string name="editor_name_too_long">12 characters at most</string>
+    <string name="editor_name_invalid">A name cannot contain line breaks or other special characters</string>
+    <string name="editor_phone_required">Please enter a phone number</string>
+    <string name="editor_phone_invalid">That number cannot be read. Use digits, optionally starting with a +.</string>
+    <string name="editor_fix_fields">Please fill in the name and number marked above</string>
+    <string name="editor_loading">Loading the contact…</string>
+    <string name="editor_capacity_reached">There are already %1$d contacts, so no more can be added. Delete one you no longer need first.</string>
+
+    <!-- ============ S06 crop ============ -->
+    <string name="crop_title">Adjust the photo</string>
+    <string name="crop_hint">Put the face inside the square. You can zoom and move it.</string>
+    <string name="crop_use">Use this photo</string>
+    <string name="crop_cancel">Cancel</string>
+    <string name="crop_loading">Opening the photo…</string>
+    <string name="crop_failed">This photo cannot be used. Please choose another.</string>
+    <string name="crop_failed_hint">The format may not be supported, or the file may be damaged.</string>
+
+    <!-- ============ S07 import from the address book ============ -->
+    <string name="contacts_title">Import from this phone\'s contacts</string>
+    <string name="contacts_intro">This reads this phone\'s address book so you can pick the people to add.</string>
+    <string name="contacts_intro_hint">It only reads. The address book on this phone is never changed.</string>
+    <string name="contacts_allow">Allow reading contacts</string>
+    <string name="contacts_denied">Permission to read contacts has not been granted</string>
+    <string name="contacts_denied_hint">You can grant it again, or go back and add someone by hand.</string>
+    <string name="contacts_retry_permission">Grant it again</string>
+    <string name="contacts_open_settings">Open system settings</string>
+    <string name="contacts_manual_add">Add by hand</string>
+    <string name="contacts_search_hint">Search by name</string>
+    <string name="contacts_selected_count">%1$d selected</string>
+    <string name="contacts_select_all">Select all</string>
+    <string name="contacts_clear_selection">Clear</string>
+    <string name="contacts_load_failed">Could not read the address book this time</string>
+    <string name="contacts_empty">No contacts found in the address book</string>
+    <string name="contacts_next">Next: preview</string>
+    <string name="contacts_back_to_pick">Back to the list</string>
+    <string name="contacts_number_picker_title">Choose the number to dial</string>
+    <string name="contacts_number_needed">Choose a number first</string>
+    <string name="contacts_name_too_long">That name is over 12 characters; please shorten it</string>
+    <string name="phone_type_mobile">Mobile</string>
+    <string name="phone_type_home">Home</string>
+    <string name="phone_type_work">Work</string>
+    <string name="phone_type_fax">Fax</string>
+    <string name="contacts_number_missing">This number cannot be used. Unselect the person, or fix it in the address book first.</string>
+    <string name="contacts_name_editor_label">What this phone will call them</string>
+    <string name="contacts_preview_title">Confirm the people to add</string>
+    <string name="contacts_preview_new">%1$d will be added</string>
+    <string name="contacts_preview_skipped">%1$d already have a number here, so they will be skipped</string>
+    <string name="contacts_preview_missing_photo">%1$d have no photo; a colour and a person outline will be used instead</string>
+    <string name="contacts_preview_unresolved">%1$d still need attention: choose the number to dial, or shorten the name</string>
+    <string name="contacts_preview_order">They are added in the order shown here; you can reorder them later under Manage contacts.</string>
+    <string name="contacts_over_capacity">These plus the existing contacts would go over %1$d. Please select fewer.</string>
+    <string name="contacts_import">Start importing</string>
+    <string name="contacts_importing">Saving, please wait</string>
+    <string name="contacts_result">Added %1$d, skipped %2$d. The names and photos of the contacts already here were not changed.</string>
+    <string name="contacts_result_partial">Added %1$d, skipped %2$d, and %3$d had a problem so were not imported. The photos of the contacts already here were not changed.</string>
+
+    <!-- ============ S08 import from a file ============ -->
+    <string name="import_title">Import from a file</string>
+    <string name="import_choose">Choose a file</string>
+    <string name="import_choose_hint">Choose the ZIP file exported by the other phone.</string>
+    <string name="import_checking">Checking the file…</string>
+    <string name="import_file_summary">File: %1$s</string>
+    <string name="import_exported_at">Exported: %1$s</string>
+    <string name="import_counts">%1$d contacts and %2$d photos</string>
+    <string name="import_mode_append">Add the new people, keep the ones already here</string>
+    <string name="import_mode_replace">Replace everyone with the people in this file</string>
+    <string name="import_append_plan">%1$d will be added, %2$d kept, %3$d skipped</string>
+    <string name="import_append_help">Different elderly users may call the same person different things. The names can be changed after importing.</string>
+    <string name="import_font_unchanged">Importing does not change this phone\'s text size or language.</string>
+    <string name="import_replace_warning">This deletes the %1$d contacts on this phone and puts the file\'s %2$d in their place. Their photos and order are replaced too.</string>
+    <string name="import_replace_export_first">Export the current contacts first</string>
+    <string name="import_confirm_replace">Replace everything</string>
+    <string name="import_confirm_append">Confirm import</string>
+    <string name="import_preview_empty">That file has no contacts, so there is nothing to import</string>
+    <string name="import_contacts_heading">Contacts in the file</string>
+    <string name="import_rejected_hint">Please choose a file produced by this app\'s "Export contacts".</string>
+    <string name="import_commit">Saving, please wait</string>
+    <string name="import_cancel">Cancel</string>
+    <string name="import_result_append">Added %1$d and skipped %2$d.</string>
+    <string name="import_result_none">Nothing was added; the existing contacts were kept</string>
+    <string name="import_result_replace">Replaced with the file\'s %1$d contacts</string>
+    <string name="import_stale_preview">The contacts changed while the file was being checked. Please choose the file again.</string>
+    <string name="import_capacity">This file would take the total over %1$d, so it cannot be imported</string>
+    <string name="import_invalid">That file cannot be imported. The contacts on this phone were not changed.</string>
+    <string name="import_invalid_version">That file comes from an unsupported version and cannot be imported</string>
+    <string name="import_invalid_photo">The photos in that file have a problem, so it cannot be imported</string>
+
+    <!-- ============ S09 export ============ -->
+    <string name="export_title">Export contacts</string>
+    <string name="export_summary">This exports %1$d contacts and %2$d photos.</string>
+    <string name="export_includes">It includes the names, phone numbers, photos and order.</string>
+    <string name="export_excludes">It does not include address-book contacts that were never added to this app, nor the text size, language or permissions.</string>
+    <string name="export_privacy">The file contains names, phone numbers and photos. Only send it to people you trust.</string>
+    <string name="export_generate">Build the file</string>
+    <string name="export_generating">Building the file…</string>
+    <string name="export_save">Save the file</string>
+    <string name="export_share">Share the file</string>
+    <string name="export_saved">The file was saved</string>
+    <string name="export_share_opened">The share sheet is open; choose who to send it to.</string>
+    <string name="export_cancelled">Cancelled; no file was saved</string>
+    <!-- Start of the exported file name. Only the extension is part of the contract. -->
+    <string name="export_file_prefix">SilverPhone_contacts_</string>
+    <string name="export_empty">There are no contacts yet, so there is nothing to export</string>
+    <string name="export_failed">Building the file failed. Please try again.</string>
+    <string name="export_save_failed">The file was not saved. The contacts were not changed.</string>
+    <string name="export_partial_leftover">An incomplete file may have been left in the folder you chose. Please check and delete it.</string>
+
+    <!-- ============ S10 text size ============ -->
+    <string name="font_title">Text size</string>
+    <string name="font_hint">The preview below changes straight away; tap Save to apply it.</string>
+    <string name="font_standard">Standard</string>
+    <string name="font_large">Large</string>
+    <string name="font_extra_large">Extra large</string>
+    <string name="font_huge">Huge</string>
+    <string name="font_preview_name">Daughter</string>
+    <string name="font_preview_body">Body text</string>
+    <string name="font_preview_button">Call</string>
+    <string name="font_scope_note">This only changes this app. The system phone app, home-screen icons and system dialogs are not affected.</string>
+    <string name="font_save">Save</string>
+    <string name="font_cancel">Cancel</string>
+
+    <!-- ============ S11 permission and errors ============ -->
+    <string name="help_usage_title">How to use</string>
+    <string name="help_notes_title">Please note</string>
+    <string name="help_no_permission">Calling is not allowed yet. A family member can turn it on.</string>
+    <string name="help_no_permission_hint">Open "Family settings" and tap "Allow calling".</string>
+    <string name="help_permission_granted">Allowed. Press a green Call button to make a call.</string>
+    <string name="help_no_phone_app">This device cannot make calls at the moment</string>
+    <string name="help_no_phone_app_hint">The phone may have no calling feature, or the system may be restricting it.</string>
+    <string name="help_dispatch_failed">The call did not open. Please try once more.</string>
+    <string name="help_dispatch_failed_hint">Go back to the call screen and press the Call button again.</string>
+    <string name="help_storage_unavailable">Cannot read the contact right now</string>
+    <string name="help_storage_unavailable_hint">The phone failed to read its own data. Go back and press the green button again.</string>
+    <string name="help_bad_contact">Something is wrong with this contact</string>
+    <string name="help_bad_contact_hint">The number may be incorrect. A family member can check it.</string>
+    <string name="help_back_home">Back to the call screen</string>
+    <string name="help_family_settings">Family settings</string>
+    <string name="help_sim_note">If the phone has two SIM cards, the system asks which one to use. A family member can set a default SIM in the phone\'s own settings.</string>
+    <string name="help_grant_call_permission">Allow calling</string>
+    <string name="help_permission_denied_hint">You can grant it again, or turn it on in the system settings. Press the Call button again afterwards.</string>
+    <string name="help_open_app_settings">Open system settings</string>
+    <string name="help_call_boundary">Answering, cancelling, hanging up and speakerphone all happen in the system phone app, which this app cannot control.</string>
+    <string name="help_usage_steps">1. A family member adds the photo and number under "Manage contacts".\n2. The elderly user opens the app and sees the photos.\n3. Press the green Call button under a photo.\n4. Cancel or hang up in the system phone app.</string>
+
+    <!-- ============ S13 about ============ -->
+    <string name="settings_about">About</string>
+    <string name="settings_about_desc">Version, GitHub project, update check and privacy</string>
+    <string name="about_title">About</string>
+    <string name="about_version">Version %1$s (%2$d)</string>
+    <string name="about_github">GitHub project</string>
+    <string name="about_updates_title">Updates</string>
+    <string name="about_check_updates">Check for updates</string>
+    <string name="about_check_hint">This asks GitHub for the newest version number. Nothing else is sent, and the app works the same without a connection.</string>
+    <string name="about_checking">Checking…</string>
+    <string name="about_up_to_date">You already have the newest version.</string>
+    <string name="about_update_available">Version %1$s is available.</string>
+    <string name="about_open_release">Open the download page</string>
+    <string name="about_no_release">No version has been published for download yet.</string>
+    <string name="about_open_releases_page">Open the releases page</string>
+    <string name="about_check_failed">Could not read the newest version from GitHub. Check the connection and try again.</string>
+    <string name="about_no_browser">No app on this phone can open web pages. The address is %1$s</string>
+    <string name="about_privacy_title">Privacy</string>
+    <string name="about_privacy_local">The contacts, photos and settings you add stay on this phone, in this app\'s own storage. Nothing is uploaded to a server, and there is no account and no login.</string>
+    <string name="about_privacy_tracking">There are no ads, no usage statistics and no crash reports.</string>
+    <string name="about_privacy_network">The only network request this app can make is the update check above, and only when it is tapped. It asks GitHub for the newest version number and sends no name, number or photo.</string>
+    <string name="about_privacy_calls">Calls are placed by the phone app, not by this app. The contacts permission is read-only and is used only when a family member imports people from the address book.</string>
+    <string name="about_privacy_export">An exported file contains names, phone numbers and photos, and it is not encrypted. Send it only to people you trust.</string>
+
+    <!-- ============ shared ============ -->
+    <string name="action_back">Back</string>
+    <string name="action_confirm">OK</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="storage_insufficient">Not enough space, so this change was not saved</string>
+    <string name="photo_unsupported">This photo cannot be used. Please choose another.</string>
+    <string name="photo_too_large">This photo is too large. Please choose another.</string>
+    <string name="photo_encode_failed">The photo could not be saved. Please choose another.</string>
+
+</resources>

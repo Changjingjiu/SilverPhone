@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  简体中文文案。
+  English lives in the unqualified values/ folder, so a device whose language is not
+  Chinese falls back to English rather than to Chinese. The family can also pin a
+  language in the app's own settings; see LanguagePreferences.
+-->
+<resources>
+
+    <string name="app_name">SilverPhone</string>
+
+    <!-- ============ S01 亲人首页 ============ -->
+    <string name="home_title">打电话</string>
+    <string name="home_family_entry">家属设置</string>
+    <string name="home_call_badge">拨打</string>
+    <!-- Spoken label for one call button, e.g. "给女儿打电话". -->
+    <string name="home_call_semantics">给%1$s打电话</string>
+    <string name="home_loading">正在读取亲人信息…</string>
+    <string name="home_load_failed">暂时读不到亲人信息</string>
+    <string name="home_load_failed_hint">请点“重试”，或请家人帮忙看看。</string>
+    <string name="home_retry">重试</string>
+    <string name="home_empty_title">请家人添加亲人</string>
+    <string name="home_empty_hint">家人添加照片、称呼和电话后，这里会出现亲人的照片。</string>
+    <string name="home_empty_action">家属设置</string>
+    <string name="home_handing_off">正在打开电话</string>
+
+    <!-- ============ S03 家属设置 ============ -->
+    <string name="settings_title">家属设置</string>
+    <string name="settings_manage">管理亲人</string>
+    <string name="settings_manage_desc">添加、修改、删除和排序</string>
+    <string name="settings_import_contacts">从手机通讯录导入</string>
+    <string name="settings_import_contacts_desc">读取本机系统通讯录，选择要添加的亲人</string>
+    <string name="settings_transfer">导入 / 导出</string>
+    <string name="settings_transfer_desc">用同一个文件在两台手机之间传递亲人信息</string>
+    <string name="transfer_title">导入 / 导出</string>
+    <string name="transfer_subtitle">两端用的是同一种文件：一台手机导出，另一台手机导入。</string>
+    <string name="settings_import_file">从文件导入</string>
+    <string name="settings_import_file_desc">读取另一台手机导出的专用 ZIP 文件</string>
+    <string name="settings_export">导出亲人</string>
+    <string name="settings_export_desc">生成一个包含照片的文件，传给另一位老人</string>
+    <string name="settings_font">字体大小</string>
+    <string name="settings_font_desc">调整全应用文字大小</string>
+    <string name="settings_preferences">语言与拨打区号</string>
+    <string name="settings_preferences_desc">切换界面语言，设置拨号时补的区号</string>
+    <string name="settings_permission">拨号权限与使用说明</string>
+    <string name="settings_permission_desc">怎么直接拨打电话，以及常见问题</string>
+    <string name="settings_back_home">返回打电话</string>
+    <string name="settings_count">当前共有 %1$d 位亲人</string>
+
+    <!-- ============ S12 语言与拨打区号 ============ -->
+    <string name="preferences_title">语言与拨打区号</string>
+    <string name="preferences_language_title">界面语言</string>
+    <string name="preferences_language_system">跟随系统</string>
+    <string name="preferences_language_note">切换后整个应用立刻改成这个语言。系统电话页面和系统弹窗不受影响。</string>
+    <string name="preferences_country_title">拨打区号</string>
+    <string name="preferences_country_note">亲人的号码里如果没有写国家区号，拨打时会自动加上这里的区号。号码本身已经写了区号（以 + 开头）的不会重复添加。</string>
+    <string name="preferences_country_short_note">服务号码（如 110、10086 这类少于 6 位的短号）会原样拨打，不加区号。开头带 0 的号码——比如座机 01012345678——会拨成 +86 10 1234 5678：那个 0 是国内的接入号，区号正是用来顶替它的。</string>
+    <string name="preferences_country_none">不添加</string>
+    <string name="preferences_country_custom">其他区号</string>
+    <string name="preferences_country_custom_hint">例如：+86</string>
+    <string name="preferences_country_invalid">区号格式不对，应该是一个 + 号加 1 到 4 位数字。</string>
+    <string name="preferences_country_example">拨打时会拨出：%1$s</string>
+    <string name="preferences_save">保存</string>
+    <string name="preferences_save_failed">手机没能保存，请再试一次。</string>
+    <string name="preferences_cancel">取消</string>
+    <string name="preferences_saved">已保存</string>
+
+    <!-- ============ S04 管理亲人 ============ -->
+    <string name="manage_title">管理亲人</string>
+    <string name="manage_search_hint">搜索姓名或号码</string>
+    <string name="manage_search_clear">清除搜索</string>
+    <string name="manage_add">添加亲人</string>
+    <string name="manage_move_up">上移</string>
+    <string name="manage_move_down">下移</string>
+    <string name="manage_edit">修改</string>
+    <string name="manage_empty">还没有亲人。点下面的“添加亲人”开始。</string>
+    <string name="manage_search_empty">没有找到符合的亲人</string>
+    <string name="manage_no_photo">还没有照片</string>
+    <string name="manage_capacity">已经有 %1$d 位亲人，达到上限</string>
+
+    <!-- ============ S05 添加／编辑亲人 ============ -->
+    <string name="editor_add_title">添加亲人</string>
+    <string name="editor_edit_title">修改亲人</string>
+    <string name="editor_choose_photo">选择照片</string>
+    <string name="editor_change_photo">更换照片</string>
+    <string name="editor_remove_photo">删除照片</string>
+    <string name="editor_photo_missing">还没有照片。建议选一张清楚的正面照片。</string>
+    <string name="editor_name_label">老人怎么称呼这个人</string>
+    <string name="editor_name_hint">例如：女儿、老伴、小明</string>
+    <string name="editor_name_example">最多 12 个字</string>
+    <string name="editor_phone_label">电话号码</string>
+    <string name="editor_phone_hint">例如：13800138000</string>
+    <string name="editor_phone_format_hint">可以填手机、座机，开头可以有一个 + 号</string>
+    <string name="editor_dial_preview">拨打时会拨出 %1$s</string>
+    <string name="editor_placeholder_label">没有照片时使用的颜色</string>
+    <string name="placeholder_light_blue">浅蓝色</string>
+    <string name="placeholder_light_amber">浅黄色</string>
+    <string name="placeholder_light_purple">浅紫色</string>
+    <string name="placeholder_light_teal">浅青色</string>
+    <string name="placeholder_light_rose">浅粉色</string>
+    <string name="placeholder_light_gray">浅灰色</string>
+    <string name="editor_save">保存</string>
+    <string name="editor_cancel">取消</string>
+    <string name="editor_saving">正在保存，请稍候</string>
+    <string name="editor_delete">删除这位亲人</string>
+    <string name="editor_delete_confirm_title">删除这位亲人？</string>
+    <string name="editor_delete_confirm_message">删除后，这位亲人的照片也会一起删除，无法恢复。</string>
+    <string name="editor_delete_confirm_action">确认删除</string>
+    <string name="editor_discard_title">放弃这次修改？</string>
+    <string name="editor_discard_message">还没有保存的内容会丢失。</string>
+    <string name="editor_discard_confirm">放弃</string>
+    <string name="editor_keep_editing">继续修改</string>
+    <string name="editor_same_number">已有亲人使用这个号码。可以继续保存，例如两位老人共用一部座机。</string>
+    <string name="editor_same_name">已有亲人使用同样的称呼。建议用照片区分，或换一个称呼。</string>
+    <string name="editor_name_required">请填写称呼</string>
+    <string name="editor_name_too_long">称呼最多 12 个字</string>
+    <string name="editor_name_invalid">称呼里不能有换行或其他特殊符号</string>
+    <string name="editor_phone_required">请填写电话号码</string>
+    <string name="editor_phone_invalid">这个号码无法识别。可以填数字，开头可以有一个 + 号。</string>
+    <string name="editor_fix_fields">请先填写上面标出的称呼和电话号码</string>
+    <string name="editor_loading">正在读取亲人信息…</string>
+    <string name="editor_capacity_reached">已经有 %1$d 位亲人，不能再添加。请先删除不再需要的。</string>
+
+    <!-- ============ S06 照片预览与调整 ============ -->
+    <string name="crop_title">调整照片</string>
+    <string name="crop_hint">让脸在中间的方框里，可以放大和移动。</string>
+    <string name="crop_use">使用照片</string>
+    <string name="crop_cancel">取消</string>
+    <string name="crop_loading">正在打开照片…</string>
+    <string name="crop_failed">这张照片无法使用，请换一张</string>
+    <string name="crop_failed_hint">可能是不支持的格式，或者文件已经损坏。</string>
+
+    <!-- ============ S07 从手机通讯录导入 ============ -->
+    <string name="contacts_title">从手机通讯录导入</string>
+    <string name="contacts_intro">读取手机通讯录，用来选择要添加的亲人。</string>
+    <string name="contacts_intro_hint">只读取，不会修改手机里的通讯录。</string>
+    <string name="contacts_allow">允许读取通讯录</string>
+    <string name="contacts_denied">还没有获得读取通讯录的权限</string>
+    <string name="contacts_denied_hint">可以重新授权，或者回到上一页手动添加亲人。</string>
+    <string name="contacts_retry_permission">重新授权</string>
+    <string name="contacts_open_settings">打开系统设置</string>
+    <string name="contacts_manual_add">手动添加</string>
+    <string name="contacts_search_hint">搜索姓名</string>
+    <string name="contacts_selected_count">已选 %1$d 位</string>
+    <string name="contacts_select_all">全选</string>
+    <string name="contacts_clear_selection">清除</string>
+    <string name="contacts_load_failed">暂时读不到手机通讯录</string>
+    <string name="contacts_empty">手机通讯录里没有找到联系人</string>
+    <string name="contacts_next">下一步：预览</string>
+    <string name="contacts_back_to_pick">返回重新选择</string>
+    <string name="contacts_number_picker_title">选择要拨打的号码</string>
+    <string name="contacts_number_needed">请先选择号码</string>
+    <string name="contacts_name_too_long">称呼超过 12 个字，请改短一些</string>
+    <string name="phone_type_mobile">手机</string>
+    <string name="phone_type_home">住宅</string>
+    <string name="phone_type_work">单位</string>
+    <string name="phone_type_fax">传真</string>
+    <string name="contacts_number_missing">这个人的号码不能用，请取消选择，或先修改手机通讯录</string>
+    <string name="contacts_name_editor_label">在这台手机上怎么称呼</string>
+    <string name="contacts_preview_title">确认要添加的亲人</string>
+    <string name="contacts_preview_new">将新增 %1$d 位亲人</string>
+    <string name="contacts_preview_skipped">有 %1$d 位号码已经存在，会跳过</string>
+    <string name="contacts_preview_missing_photo">有 %1$d 位没有照片，会先用颜色和人物图形代替</string>
+    <string name="contacts_preview_unresolved">还有 %1$d 位需要先处理：选好要拨打的号码，或把称呼改短</string>
+    <string name="contacts_preview_order">按现在列表的顺序添加，之后可以在管理亲人里调整。</string>
+    <string name="contacts_over_capacity">手机通讯录里的亲人加上现有亲人会超过 %1$d 位，请先少选一些。</string>
+    <string name="contacts_import">开始导入</string>
+    <string name="contacts_importing">正在保存，请稍候</string>
+    <string name="contacts_result">已新增 %1$d 位亲人，跳过 %2$d 位。现有亲人的称呼和照片没有改变。</string>
+    <string name="contacts_result_partial">已新增 %1$d 位亲人，跳过 %2$d 位，另有 %3$d 位信息有问题没有导入。现有亲人的照片没有改变。</string>
+
+    <!-- ============ S08 文件导入 ============ -->
+    <string name="import_title">从文件导入</string>
+    <string name="import_choose">选择文件</string>
+    <string name="import_choose_hint">选择另一台手机导出的“SilverPhone”ZIP 文件。</string>
+    <string name="import_checking">正在检查文件…</string>
+    <string name="import_file_summary">文件：%1$s</string>
+    <string name="import_exported_at">导出时间：%1$s</string>
+    <string name="import_counts">共 %1$d 位亲人，%2$d 张照片</string>
+    <string name="import_mode_append">添加新亲人，保留当前亲人</string>
+    <string name="import_mode_replace">用这个文件替换所有亲人</string>
+    <string name="import_append_plan">将新增 %1$d 位，保留现有 %2$d 位，跳过 %3$d 位</string>
+    <string name="import_append_help">不同老人对同一个人的称呼可能不同。导入后可以修改称呼。</string>
+    <string name="import_font_unchanged">本机字体大小和语言不会因为导入而改变。</string>
+    <string name="import_replace_warning">将删除本机现有 %1$d 位亲人，改为文件中的 %2$d 位。照片和排列顺序也会替换。</string>
+    <string name="import_replace_export_first">先导出当前亲人</string>
+    <string name="import_confirm_replace">确认替换</string>
+    <string name="import_confirm_append">确认导入</string>
+    <string name="import_preview_empty">这个文件里没有亲人，无法导入</string>
+    <string name="import_contacts_heading">文件里的亲人</string>
+    <string name="import_rejected_hint">请选择由本应用「导出亲人」生成的文件。</string>
+    <string name="import_commit">正在保存，请稍候</string>
+    <string name="import_cancel">取消</string>
+    <string name="import_result_append">已新增 %1$d 位，跳过 %2$d 位。</string>
+    <string name="import_result_none">没有新增，已保留现有亲人</string>
+    <string name="import_result_replace">已替换为文件中的 %1$d 位亲人</string>
+    <string name="import_stale_preview">亲人在检查文件期间发生了变化。请重新选择文件再试一次。</string>
+    <string name="import_capacity">加上这个文件会超过 %1$d 位，不能再导入</string>
+    <string name="import_invalid">文件无法导入，当前亲人没有改变</string>
+    <string name="import_invalid_version">这个文件来自不支持的版本，无法导入</string>
+    <string name="import_invalid_photo">文件里的照片有问题，无法导入</string>
+
+    <!-- ============ S09 导出 ============ -->
+    <string name="export_title">导出亲人</string>
+    <string name="export_summary">会导出 %1$d 位亲人和 %2$d 张照片。</string>
+    <string name="export_includes">包含称呼、电话号码、照片和排列顺序。</string>
+    <string name="export_excludes">不会导出手机通讯录里没有选入本应用的人，也不会导出字体大小、语言和权限设置。</string>
+    <string name="export_privacy">文件里有亲人的姓名、电话和照片，请只发给信任的人。</string>
+    <string name="export_generate">生成文件</string>
+    <string name="export_generating">正在生成文件…</string>
+    <string name="export_save">保存文件</string>
+    <string name="export_share">分享文件</string>
+    <string name="export_saved">文件已保存</string>
+    <string name="export_share_opened">已打开分享面板，请选择要发给谁。</string>
+    <string name="export_cancelled">已取消，没有保存文件</string>
+    <!-- Start of the exported file name. Only the extension is part of the contract. -->
+    <string name="export_file_prefix">SilverPhone_联系人_</string>
+    <string name="export_empty">还没有亲人，无法导出</string>
+    <string name="export_failed">生成文件失败，请再试一次</string>
+    <string name="export_save_failed">没有保存成功，联系人没有改变</string>
+    <string name="export_partial_leftover">可能有没写完整的文件留在你选的文件夹里，请检查后删除。</string>
+
+    <!-- ============ S10 字号设置 ============ -->
+    <string name="font_title">字体大小</string>
+    <string name="font_hint">选择后下面会立刻变化，点“保存”才会生效。</string>
+    <string name="font_standard">标准</string>
+    <string name="font_large">大</string>
+    <string name="font_extra_large">特大</string>
+    <string name="font_huge">超大</string>
+    <string name="font_preview_name">女儿</string>
+    <string name="font_preview_body">正文文字</string>
+    <string name="font_preview_button">拨打</string>
+    <string name="font_scope_note">只改变本应用的文字。系统电话页面、桌面图标和系统弹窗不受影响。</string>
+    <string name="font_save">保存</string>
+    <string name="font_cancel">取消</string>
+
+    <!-- ============ S11 权限与错误 ============ -->
+    <string name="help_usage_title">怎么用</string>
+    <string name="help_notes_title">请注意</string>
+    <string name="help_no_permission">还不能打电话，请家人帮忙开启</string>
+    <string name="help_no_permission_hint">家人打开“家属设置”，点“开启拨号权限”就可以。</string>
+    <string name="help_permission_granted">已开启，点亲人的拨打按钮就能打电话</string>
+    <string name="help_no_phone_app">这台设备暂时不能打电话</string>
+    <string name="help_no_phone_app_hint">手机上可能没有电话功能，或者被系统限制了。</string>
+    <string name="help_dispatch_failed">电话没有打开，请再试一次</string>
+    <string name="help_dispatch_failed_hint">回到首页后，再按一次亲人的拨打按钮。</string>
+    <string name="help_storage_unavailable">暂时读不到亲人信息</string>
+    <string name="help_storage_unavailable_hint">手机没能读出资料。请返回后再点一次绿色按钮。</string>
+    <string name="help_bad_contact">这个亲人的信息有问题</string>
+    <string name="help_bad_contact_hint">号码可能不正确，请家人帮忙检查。</string>
+    <string name="help_back_home">返回首页</string>
+    <string name="help_family_settings">家属设置</string>
+    <string name="help_sim_note">如果手机装了两张卡，系统会先问用哪一张。可以让家人在手机设置里指定默认卡。</string>
+    <string name="help_grant_call_permission">开启拨号权限</string>
+    <string name="help_permission_denied_hint">可以重新授权，或者去系统设置里手动打开。开启后需要重新按一次拨打按钮。</string>
+    <string name="help_open_app_settings">打开系统设置</string>
+    <string name="help_call_boundary">电话接通、取消呼叫、挂断和免提都在系统的电话页面里操作，本应用无法控制。</string>
+    <string name="help_usage_steps">1. 家人先在“管理亲人”里添加照片和号码。\n2. 老人打开应用，看到亲人的照片。\n3. 按亲人照片下面的绿色拨打按钮，电话就会打出去。\n4. 挂断或取消在系统的电话页面里操作。</string>
+
+    <!-- ============ S13 关于 ============ -->
+    <string name="settings_about">关于</string>
+    <string name="settings_about_desc">版本、GitHub 项目、检查更新和隐私说明</string>
+    <string name="about_title">关于</string>
+    <string name="about_version">版本 %1$s（%2$d）</string>
+    <string name="about_github">GitHub 项目</string>
+    <string name="about_updates_title">版本更新</string>
+    <string name="about_check_updates">检查更新</string>
+    <string name="about_check_hint">只会向 GitHub 问一句最新版本号，不会发送其他内容；没有网络时应用照常使用。</string>
+    <string name="about_checking">正在检查…</string>
+    <string name="about_up_to_date">已经是最新版本。</string>
+    <string name="about_update_available">有新版本 %1$s 可以下载。</string>
+    <string name="about_open_release">打开下载页面</string>
+    <string name="about_no_release">目前还没有发布可以下载的版本。</string>
+    <string name="about_open_releases_page">打开发布页面</string>
+    <string name="about_check_failed">没有读到 GitHub 上的最新版本，请检查网络后再试一次。</string>
+    <string name="about_no_browser">这台手机上找不到能打开网页的应用，地址是 %1$s</string>
+    <string name="about_privacy_title">隐私说明</string>
+    <string name="about_privacy_local">添加的亲人姓名、电话、照片和设置都只保存在这台手机的应用里，不会上传到服务器，也不需要注册或登录。</string>
+    <string name="about_privacy_tracking">没有广告，也不统计使用情况，不上报崩溃信息。</string>
+    <string name="about_privacy_network">应用唯一会联网的地方就是上面的“检查更新”，而且只有点了它才会联网：只向 GitHub 询问最新版本号，不会发送任何亲人信息。</string>
+    <string name="about_privacy_calls">电话由系统电话应用拨打；读取通讯录的权限只在家属从通讯录导入亲人时使用，而且只读不写。</string>
+    <string name="about_privacy_export">导出的文件里有姓名、电话和照片，文件没有加密，请只发给信任的人。</string>
+
+    <!-- ============ 通用 ============ -->
+    <string name="action_back">返回</string>
+    <string name="action_confirm">确定</string>
+    <string name="action_cancel">取消</string>
+    <string name="storage_insufficient">空间不足，没有保存这次修改</string>
+    <string name="photo_unsupported">这张照片无法使用，请换一张</string>
+    <string name="photo_too_large">这张照片太大，请换一张</string>
+    <string name="photo_encode_failed">照片无法保存，请换一张</string>
+
+</resources>

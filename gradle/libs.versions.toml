@@ -1,0 +1,106 @@
+[versions]
+# Build tooling — see build-matrix.md for the recorded verification of this set.
+agp = "8.13.2"
+kotlin = "2.2.21"
+ksp = "2.2.21-2.0.5"
+
+# AndroidX / Compose.
+#
+# These are the newest releases that still declare minCompileSdk <= 36 and no
+# minimum AGP above 8.13.2. Compose 1.12.x, core-ktx 1.19.x and lifecycle 2.11.x
+# all require compileSdk 37 plus AGP 9.1, which would force a Gradle 9 / Kotlin
+# 2.4 toolchain change. Raising compileSdk is allowed; raising minSdk is not, and
+# nothing was gained here beyond the newest numbering. See build-matrix.md.
+composeBom = "2026.06.01"
+coreKtx = "1.18.0"
+# Needed only for AppCompatDelegate.setApplicationLocales, which is how the
+# interface language is switched on API 23 without a custom context wrapper.
+appcompat = "1.7.1"
+activityCompose = "1.12.4"
+lifecycle = "2.10.0"
+# navigation-compose 2.10.x declares minSdk 24, which would silently raise our
+# API 23 contract (baseline B10). 2.9.8 is the newest release that still declares
+# minSdk 21, so V1 pins it deliberately.
+navigationCompose = "2.9.8"
+exifinterface = "1.4.2"
+
+# Persistence
+room = "2.8.5"
+
+# Serialization / async
+kotlinxSerializationJson = "1.11.0"
+coroutines = "1.10.2"
+
+# Third party.
+#
+# Coil 3.5.0 and 3.6.x are built against kotlin-stdlib 2.4.0, which forces the
+# whole project onto a Kotlin 2.4 compiler (and therefore a KSP release that does
+# not exist yet for Room). 3.4.0 is the newest Coil that requires only stdlib
+# 2.3.10, which the pinned Kotlin 2.2.21 compiler can read. It also declares no
+# minimum compileSdk.
+coil = "3.4.0"
+cropper = "4.7.0"
+# Used directly by our own Coil Fetcher, so it is declared rather than picked up
+# implicitly from Coil's own api dependency. Version matches what Coil 3.4.0
+# resolves to.
+okio = "3.17.0"
+
+# Test
+junit = "4.13.2"
+androidxTestCore = "1.7.0"
+androidxTestJunit = "1.3.0"
+androidxTestRunner = "1.7.0"
+androidxTestRules = "1.7.0"
+espressoCore = "3.7.0"
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
+androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle" }
+androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "exifinterface" }
+
+# Compose — versions come from the BOM.
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+# Only the core icon set is used: it already carries every glyph this app needs,
+# and the extended set would add a very large artifact for no benefit.
+androidx-compose-material-icons-core = { group = "androidx.compose.material", name = "material-icons-core" }
+
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+androidx-room-testing = { group = "androidx.room", name = "room-testing", version.ref = "room" }
+
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
+
+coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+coil-core = { group = "io.coil-kt.coil3", name = "coil-core", version.ref = "coil" }
+cropper = { group = "com.vanniktech", name = "android-image-cropper", version.ref = "cropper" }
+okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
+
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-test-core = { group = "androidx.test", name = "core", version.ref = "androidxTestCore" }
+androidx-test-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxTestJunit" }
+androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidxTestRunner" }
+androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "androidxTestRules" }
+espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+room = { id = "androidx.room", version.ref = "room" }

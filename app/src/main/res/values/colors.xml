@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Semantic palette from the UI spec. Pages must reference these names, not
+      ad-hoc approximations, so the fixed high-contrast light theme stays stable.
+    -->
+    <color name="brand_lime">#D6FF00</color>
+    <color name="ink">#172554</color>
+    <color name="background">#F7F8FA</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="text_primary">#172554</color>
+    <color name="text_secondary">#475569</color>
+    <color name="call_green">#146C43</color>
+    <color name="on_call_green">#FFFFFF</color>
+    <color name="cancel_red">#B42318</color>
+    <color name="danger_red">#B42318</color>
+    <color name="outline">#64748B</color>
+    <color name="focus">#1D4ED8</color>
+
+    <!-- Fixed placeholder backgrounds for contacts without a photo. -->
+    <color name="placeholder_light_blue">#DBEAFE</color>
+    <color name="placeholder_light_amber">#FEF3C7</color>
+    <color name="placeholder_light_purple">#F3E8FF</color>
+    <color name="placeholder_light_teal">#CCFBF1</color>
+    <color name="placeholder_light_rose">#FFE4E6</color>
+    <color name="placeholder_light_gray">#E2E8F0</color>
+</resources>

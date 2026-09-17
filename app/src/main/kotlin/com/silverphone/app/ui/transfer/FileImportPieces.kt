@@ -1,0 +1,328 @@
+package com.silverphone.app.ui.transfer
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.unit.dp
+import com.silverphone.app.R
+import com.silverphone.app.domain.ImportCommitResult
+import com.silverphone.app.domain.ImportedContact
+import com.silverphone.app.platform.transfer.BackupReader
+import com.silverphone.app.ui.components.PlaceholderAvatar
+import com.silverphone.app.ui.components.PrimaryActionButton
+import com.silverphone.app.ui.theme.AppColors
+import com.silverphone.app.ui.theme.LocalAppDimens
+import com.silverphone.app.ui.theme.LocalAppTextStyles
+
+/**
+ * The states S08 can be in, kept apart from the screen that arranges them: nothing
+ * chosen, checking, refused, one file entry, one mode choice, the result, and the
+ * explicit replace confirmation.
+ */
+
+private val THUMB = 64.dp
+
+@Composable
+internal fun IdleBody(onChoose: () -> Unit) {
+    val dimens = LocalAppDimens.current
+    val styles = LocalAppTextStyles.current
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            // Scrollable, so the action stays reachable when the text is large.
+            .verticalScroll(rememberScrollState())
+            .padding(top = dimens.touchGap),
+        verticalArrangement = Arrangement.spacedBy(dimens.touchGap),
+    ) {
+        Text(
+            text = stringResource(R.string.import_choose_hint),
+            style = styles.body,
+            color = AppColors.TextSecondary,
+        )
+        PrimaryActionButton(
+            text = stringResource(R.string.import_choose),
+            icon = Icons.Filled.Refresh,
+            onClick = onChoose,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+
+@Composable
+internal fun CheckingBody() {
+    val styles = LocalAppTextStyles.current
+    val dimens = LocalAppDimens.current
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        CircularProgressIndicator(
+            color = AppColors.Ink,
+            modifier = Modifier.size(dimens.primaryGlyph),
+        )
+        Text(
+            text = stringResource(R.string.import_checking),
+            style = styles.body,
+            color = AppColors.TextSecondary,
+            modifier = Modifier.padding(top = dimens.touchGap),
+        )
+    }
+}
+
+@Composable
+internal fun RejectedBody(reason: BackupReader.Reason, onChooseAgain: () -> Unit) {
+    val styles = LocalAppTextStyles.current
+    val dimens = LocalAppDimens.current
+    val message = when (reason) {
+        BackupReader.Reason.UNSUPPORTED_VERSION -> stringResource(R.string.import_invalid_version)
+        BackupReader.Reason.PHOTO_MISSING,
+        BackupReader.Reason.PHOTO_MISMATCH,
+        BackupReader.Reason.PHOTO_INVALID,
+        -> stringResource(R.string.import_invalid_photo)
+
+        BackupReader.Reason.EMPTY_CONTACTS -> stringResource(R.string.import_preview_empty)
+        else -> stringResource(R.string.import_invalid)
+    }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(top = dimens.touchGap),
+        verticalArrangement = Arrangement.spacedBy(dimens.touchGap),
+    ) {
+        Text(text = message, style = styles.body, color = AppColors.DangerRed)
+        Text(
+            text = stringResource(R.string.import_rejected_hint),
+            style = styles.caption,
+            color = AppColors.TextSecondary,
+        )
+        PrimaryActionButton(
+            text = stringResource(R.string.import_choose),
+            icon = Icons.Filled.Refresh,
+            onClick = onChooseAgain,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+
+@Composable
+internal fun FileEntryRow(contact: ImportedContact) {
+    val dimens = LocalAppDimens.current
+    val styles = LocalAppTextStyles.current
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(dimens.cardCorner))
+            .background(AppColors.Surface)
+            .padding(dimens.cardInnerPadding),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        val bitmap = remember(contact.id) {
+            contact.photo?.jpegBytes?.let { bytes ->
+                android.graphics.BitmapFactory
+                    .decodeByteArray(bytes, 0, bytes.size)
+                    ?.asImageBitmap()
+            }
+        }
+        Box(
+            modifier = Modifier
+                .size(THUMB)
+                .clip(RoundedCornerShape(10.dp)),
+        ) {
+            if (bitmap != null) {
+                Image(
+                    bitmap = bitmap,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            } else {
+                PlaceholderAvatar(
+                    color = contact.placeholderColor,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+        }
+        Spacer(Modifier.width(dimens.cardInnerPadding))
+        Column {
+            Text(text = contact.displayName, style = styles.body, color = AppColors.TextPrimary)
+            Text(text = contact.phoneNumber, style = styles.caption, color = AppColors.TextSecondary)
+        }
+    }
+}
+
+@Composable
+internal fun ModeOption(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    danger: Boolean = false,
+) {
+    val dimens = LocalAppDimens.current
+    val styles = LocalAppTextStyles.current
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(dimens.cardCorner))
+            .background(AppColors.Surface)
+            .border(
+                width = if (selected) 3.dp else 1.dp,
+                color = when {
+                    selected && danger -> AppColors.DangerRed
+                    selected -> AppColors.Focus
+                    else -> AppColors.Outline
+                },
+                shape = RoundedCornerShape(dimens.cardCorner),
+            )
+            .clickable(onClick = onClick)
+            // Selection was signalled only by a border width, which a screen reader
+            // cannot convey and a low-vision user can easily miss.
+            .clearAndSetSemantics {
+                contentDescription = label
+                role = Role.RadioButton
+                this.selected = selected
+                onClick(label = label) {
+                    onClick()
+                    true
+                }
+            }
+            .heightIn(min = dimens.minTouchTarget)
+            .padding(dimens.cardInnerPadding),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = label,
+            style = styles.body,
+            color = if (danger) AppColors.DangerRed else AppColors.TextPrimary,
+        )
+    }
+}
+
+@Composable
+internal fun DoneBody(result: ImportCommitResult) {
+    val styles = LocalAppTextStyles.current
+    val dimens = LocalAppDimens.current
+    val message = when (result) {
+        is ImportCommitResult.Appended -> stringResource(
+            R.string.import_result_append,
+            result.added,
+            result.skipped,
+        )
+
+        is ImportCommitResult.Replaced -> stringResource(
+            R.string.import_result_replace,
+            result.total,
+        )
+
+        ImportCommitResult.NoChanges -> stringResource(R.string.import_result_none)
+        ImportCommitResult.StalePreview -> stringResource(R.string.import_stale_preview)
+        is ImportCommitResult.CapacityExceeded -> stringResource(
+            R.string.import_capacity,
+            result.limit,
+        )
+
+        is ImportCommitResult.StorageFailed -> stringResource(R.string.storage_insufficient)
+    }
+    val danger = result is ImportCommitResult.StalePreview ||
+        result is ImportCommitResult.CapacityExceeded ||
+        result is ImportCommitResult.StorageFailed
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = dimens.touchGap),
+    ) {
+        Text(
+            text = message,
+            style = styles.body,
+            color = if (danger) AppColors.DangerRed else AppColors.TextPrimary,
+        )
+    }
+}
+
+/**
+ * The dangerous confirmation. It states both counts and offers "export first", so
+ * replacing is never something a family member can do by accident.
+ */
+@Composable
+internal fun ReplaceConfirmation(
+    existingCount: Int,
+    incomingCount: Int,
+    onExportFirst: () -> Unit,
+    onCancel: () -> Unit,
+    onConfirm: () -> Unit,
+) {
+    val styles = LocalAppTextStyles.current
+    AlertDialog(
+        onDismissRequest = onCancel,
+        title = { Text(stringResource(R.string.import_mode_replace), style = styles.body) },
+        text = {
+            Text(
+                text = stringResource(
+                    R.string.import_replace_warning,
+                    existingCount,
+                    incomingCount,
+                ),
+                style = styles.caption,
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm, modifier = Modifier.heightIn(min = 56.dp)) {
+                Text(
+                    text = stringResource(R.string.import_confirm_replace),
+                    style = styles.body,
+                    color = AppColors.DangerRed,
+                )
+            }
+        },
+        dismissButton = {
+            Column {
+                TextButton(onClick = onExportFirst, modifier = Modifier.heightIn(min = 56.dp)) {
+                    Text(
+                        text = stringResource(R.string.import_replace_export_first),
+                        style = styles.caption,
+                    )
+                }
+                TextButton(onClick = onCancel, modifier = Modifier.heightIn(min = 56.dp)) {
+                    Text(stringResource(R.string.import_cancel), style = styles.caption)
+                }
+            }
+        },
+    )
+}

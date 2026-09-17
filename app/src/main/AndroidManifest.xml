@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+      Three permissions, each used for one thing:
+        * CALL_PHONE     - the elderly user taps a green button to place a call
+                           (also requested at runtime, from the tap that needed it)
+        * READ_CONTACTS  - a family member bulk-selects from the phone's contacts
+                           (also requested at runtime; read-only)
+        * INTERNET       - the manual "Check for updates" tap on the About screen,
+                           and nothing else. The app is fully usable offline, the
+                           check sends no contact, photo or personal data, and it
+                           never runs on its own. See IMPLEMENTATION-NOTES.md.
+      Deliberately absent: WRITE_CONTACTS, READ/WRITE_CALL_LOG, READ_PHONE_STATE,
+      CAMERA, READ_MEDIA_IMAGES, external storage, POST_NOTIFICATIONS and
+      SYSTEM_ALERT_WINDOW. See README "Permissions".
+    -->
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!--
+      Calling is what this app is for, but a missing telephony stack is already a
+      handled case: the home screen still shows the contacts and the help screen
+      says the device cannot make calls. Declaring it as not required keeps the app
+      installable on such devices instead of having the store filter it out.
+    -->
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false" />
+
+    <application
+        android:name=".App"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:theme="@style/Theme.SilverPhone"
+        tools:targetApi="31">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!--
+          Exposes only cacheDir/exports/. exported=false plus a per-URI read grant
+          means no other app can reach the database or the staging directories.
+        -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <!--
+          The crop library ships its own activity and file provider through manifest
+          merging, and the library declares the activity exported so that any app can
+          invoke it. This app only ever uses the library's in-process crop view, so
+          there is no reason for other apps to be able to open it, and there is no
+          reason for its provider to reach the whole cache: the provider's path map is
+          overridden in res/xml/cropper_library_file_paths.xml, where it now serves
+          nothing at all.
+        -->
+        <activity
+            android:name="com.canhub.cropper.CropImageActivity"
+            android:exported="false"
+            tools:replace="android:exported" />
+    </application>
+</manifest>

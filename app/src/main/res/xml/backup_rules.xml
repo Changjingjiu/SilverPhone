@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Explicit backup rules for API 23-30. allowBackup is false, so nothing is backed
+  up; these rules state that explicitly rather than relying on the default. The
+  app's data is only meant to move between devices through the user-driven ZIP
+  exchange, never through a system cloud backup.
+-->
+<full-backup-content>
+    <exclude domain="database" path="." />
+    <exclude domain="sharedpref" path="." />
+    <exclude domain="file" path="." />
+    <exclude domain="external" path="." />
+    <exclude domain="root" path="." />
+</full-backup-content>

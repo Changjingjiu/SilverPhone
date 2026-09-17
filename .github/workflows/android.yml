@@ -1,0 +1,81 @@
+name: Android
+
+# Runs on every push to main (so a broken build is caught before a release), on pull
+# requests, and on version tags - which is the only path that publishes a release.
+on:
+  push:
+    branches: ["main"]
+    tags: ["v*"]
+  pull_request:
+
+# Two pushes to the same branch do not both need to build; the newer one wins. Tags
+# are never cancelled, because a cancelled tag build would leave the tag without its
+# release.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref_type != 'tag' }}
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      # No local.properties is needed: the runner already has the Android SDK, and the
+      # file holds this machine's SDK path and is git-ignored.
+      - name: Verify and build
+        run: ./gradlew --no-daemon testDebugUnitTest lintDebug assembleDebug assembleRelease
+
+      - name: Upload the APKs
+        uses: actions/upload-artifact@v7
+        with:
+          name: silverphone-apk
+          path: |
+            app/build/outputs/apk/debug/app-debug.apk
+            app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
+
+  # A tag is the release trigger, which is also what the in-app "Check for updates"
+  # reads: it asks GitHub for the newest published release, not for the newest tag.
+  release:
+    needs: build
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - name: Download the APKs
+        uses: actions/download-artifact@v8
+        with:
+          name: silverphone-apk
+          path: apks
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME}"
+          cp apks/app-release.apk "SilverPhone-${version}.apk"
+          cp apks/app-debug.apk "SilverPhone-${version}-debug.apk"
+          gh release create "${version}" \
+            "SilverPhone-${version}.apk" \
+            "SilverPhone-${version}-debug.apk" \
+            --title "SilverPhone ${version}" \
+            --notes "Installs over an older SilverPhone build only if it was signed with the same key. Both APKs here are signed with the Android debug key, so they are test builds: uninstall the app before installing one, or sign future releases with the same key. See docs/RELEASING.md." \
+            --generate-notes

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Fixed light theme. Dynamic colour is deliberately not used: the elderly
+      user's recognition depends on the colours staying the same on every launch.
+      Parent is the framework Material theme so no XML Material Components
+      dependency is pulled in; all real styling happens in Compose.
+    -->
+    <style name="Theme.SilverPhone" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:colorBackground">@color/background</item>
+        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:navigationBarColor">@color/background</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+</resources>
