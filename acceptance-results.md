@@ -8,18 +8,20 @@ verified). Reproducing a build is not evidence that a real phone call works.
 
 | Suite | Command | Target | Result |
 |---|---|---|---|
-| JVM unit tests | `./gradlew testDebugUnitTest` | JDK 17, host | **84 tests, 0 failures** |
-| Instrumented tests | `./gradlew connectedDebugAndroidTest` | API 23 emulator, arm64 | **48 tests, 0 failures** |
-| Lint | `./gradlew lintDebug` | host | **0 errors, 42 warnings** |
+| JVM unit tests | `./gradlew testDebugUnitTest` | JDK 17, host | **104 tests, 0 failures** |
+| Instrumented tests | `./gradlew connectedDebugAndroidTest` | API 23 emulator, arm64 | **51 tests, 0 failures** |
+| Lint | `./gradlew lintDebug` | host | **0 errors, 52 warnings** |
 | Debug build | `./gradlew assembleDebug` | — | SUCCESS |
 | Release build (R8) | `./gradlew assembleRelease` | — | SUCCESS |
 
 Unit tests by class: `DisplayNameRulesTest` 8, `PhoneNumberRulesTest` 12,
-`ImportPlannerTest` 8, `DialCoordinatorTest` 11, `BackupJsonTest` 9, `ContactSearchTest` 11,
-`ContactsImportPlannerTest` 11.
+`ImportPlannerTest` 8, `DialCoordinatorTest` 11, `BackupJsonTest` 9, `ContactSearchTest` 13,
+`ContactsImportPlannerTest` 11, `CountryCodeTest` 12, `AppVersionTest` 8,
+`GitHubReleaseJsonTest` 5, `AboutViewModelTest` 7.
 
-Instrumented by class: `ContactRepositoryTest` 15, `HomeDialTest` 5,
-`BackupRoundTripTest` 14, `PhotoNormalizerTest` 7.
+Instrumented by class: `ContactRepositoryTest` 15, `HomeDialTest` 8,
+`BackupRoundTripTest` 14, `PhotoNormalizerTest` 7, `ManageSearchFocusTest` 4,
+`AboutScreenTest` 3.
 
 ### Targets actually used
 
@@ -255,6 +257,34 @@ list could collapse to zero height does not bite at any combination reachable on
 device, but it is a consequence of the preview being pinned, and the pinning is the fix for
 the sliced preview reported earlier.
 
+### Round 6 (2026-09-17): the About screen, the update check and the first release
+
+The owner asked for two more things, in their words:
+
+> 1.要在软件的设置里最下面放上一个关于按钮 点开之后现实软件的版本 github项目的地址(要可以
+> 点击) 检查更新 … 并附属上一些隐私政策
+> 2. 仓库如图2所示 记得要搞好能同步更新的功能 另外整个项目都叫 SilverPhone 不要命名混乱!
+
+**The rename, in full.** Every place a name appears was renamed in one pass instead of
+being left behind as a compatibility layer: the Gradle root project, the `namespace` and
+`applicationId` (`com.silverphone.app`), therefore every package, directory and import, the
+theme (`Theme.SilverPhone`), the Room database file (`silverphone.db`) and its schema
+directory, the backup archive's `format` marker and file prefix, the fixture archive
+(`SilverPhone_联系人_测试包.zip`), the launcher label in both locales, and the repository
+itself. `rg -i 'familydialer|family dialer|family-dialer|亲人电话'` over the tree now matches
+only `IMPLEMENTATION-NOTES.md`'s own account of the rename. A build that carries the old
+name is not upgraded in place: the database file changed name with the package, and that is
+the intended reading of the project's no-compatibility-layer rule, stated here so nobody
+looks for a migration that does not exist.
+
+What the new screen cost, and what was found while building it:
+
+| # | Found | Reproduced | Fixed by |
+|---|---|---|---|
+| 51 | **"It declares no `INTERNET` permission at all" stopped being true the moment an update check was asked for.** The claim was in both READMEs, and the manifest's own comment listed the permissions the app does *not* have. A reader who opened the merged manifest would have caught the contradiction before a reviewer did. | From the request itself: a version check that cannot reach the network cannot exist. | The manifest declares `INTERNET` with a comment naming its single use, the READMEs were rewritten, the permission table row `INTERNET 否` in `docs/spec/04` is recorded as overridden in `IMPLEMENTATION-NOTES.md`, and the privacy text on the About screen states the same limit. |
+| 52 | A release tag compared as text sorts before it compares as a version: `v1.10.0` sorts before `v1.9.0`, so the screen would have called a months-old release the newest one. | Written as unit tests before the comparison was used anywhere. | `AppVersion` compares components as numbers, and treats a pre-release suffix - the debug build ships as `1.0.0-debug` - as older than the release with the same number. |
+| 53 | **The instrumented suite went red twice in a row** while the API 23 AVD was still finishing a cold first boot: once as a failed `AboutScreenTest` assertion, once as a killed instrumentation process during `PhotoNormalizerTest`. Both runs named a different test, and both runs reported one failure with the process dying immediately afterwards. | Kept because a red run that is explained away is worth less than one that is explained: the same suite then passed 51/51 twice on the booted emulator, and `AboutScreenTest` passed 3/3 on its own in between. | Nothing in the app. The run of record is on a device whose boot animation has stopped; the two red runs are recorded here so the sequence is not hidden. |
+
 ## 1. Core acceptance criteria
 
 | # | Covers | What was done | Status | Evidence |
@@ -283,10 +313,14 @@ the sliced preview reported earlier.
 | AC22 | F12 | Four presets on a real device: selected 超大, the whole page re-rendered at the previewed size, saved, and the new size applied globally on another screen and survived a process restart. The stored `fontPreset` is `HUGE` and `contactsRevision` stayed at 1, so a font change does not look like a contact change. | 通过 (保存与全局生效) / 未验证 (取消恢复) | `13-font-huge.png` shows the page at 1.6× with 保存/取消 still reachable; `14-home-huge-single-column.png` shows the home screen at the same preset; the database was read back as `HUGE\|1`. **Cancel-restores was not exercised.** |
 | AC23 | F12, F15 | At the app's largest preset the home screen reflowed from two columns to one by itself, with no truncated name and no shrunk text — the column rule measures four characters in the current style and falls back to a single column when two would not fit. Button labels wrap to two lines rather than shrinking. | 通过 (应用超大档) / 未验证 (系统最大字) | `14-home-huge-single-column.png`, `13-font-huge.png`. **The system font scale was left at 1.0 throughout; the combination with a 2.0 system scale was not measured.** |
 | AC24 | F15 | Each card is announced once and is activatable. | 部分 (结构) / 未验证 (TalkBack) | `HomeDialTest.theCardIsExactlyOneAccessibilityNode` asserts exactly one node and that the name is not also exposed as separate text. **TalkBack itself was not run.** |
-| AC25 | F14 | Works with no network. | 通过 (结构) | The merged manifest contains only `CALL_PHONE` and `READ_CONTACTS`; there is no `INTERNET` permission, so the app cannot reach the network. **Airplane-mode execution was not performed.** |
+| AC25 | F14 | Works with no network. | 通过 (结构) / 未验证 (飞行模式) | Everything except the About screen's update check is local, and the check is started by a tap: with no connection it reports an unreadable answer rather than "you are up to date" (`GitHubReleaseJsonTest`, `AboutViewModelTest`). The merged manifest declares `CALL_PHONE`, `READ_CONTACTS` and `INTERNET`, the last used by that single request - the departure from `docs/spec/04` is recorded in `IMPLEMENTATION-NOTES.md`. **Airplane-mode execution was not performed.** |
 | AC26 | F15 | Install and run the core flow on API 23. | 通过 | Installed, launched, navigated, created a contact, exported an archive, all on `SilverPhone_API23` (Android 6.0, arm64). `minSdkVersion:'23'` confirmed in the APK. |
 | AC27 | F11 | 500-contact limit and stale-preview handling. | 通过 | `ContactRepositoryTest.capacityIsEnforcedAtTheLimit` (fills 500, then asserts a 501st is refused as a whole), `aStalePreviewIsRefused` |
 | AC28 | F14, F15 | Process death: only a complete old or new set; no call is resumed. | 通过 (模拟器) | Force-stopped the app mid-session and relaunched: all six contacts were present and no dial intent fired. The dial lock and its channel live in memory only, so a new process starts with nothing pending. |
+| AC29 | S13 | 关于 is the last entry in 家属设置, and the About page shows the installed version and build number, the GitHub address as text that is also tappable, the check button and the privacy statement - none of which needs a network answer to be read. | 通过 (模拟器) | `15-family-settings-about-en.png` (the entry), `16-about-en.png` and `17-about-zh.png` (the release build, both languages); `AboutScreenTest` (3 tests: the version and the address before any check, the download page only when a newer version exists, and an unanswered check never shown as being up to date) |
+| AC30 | S13 | The update check names the newest **published release** and never guesses: newer → offers that release's page, same number → 已经是最新版本, nothing published → says so, unreachable or unreadable → says so. A tag pushed without a release is invisible to it by design. | 通过 (规则与模拟器) | `AboutViewModelTest` (7), `GitHubReleaseJsonTest` (5), `AppVersionTest` (8). Driven on the emulator against the published `v1.0.0`: see 18. |
+| AC31 | S13, F14 | The app makes no request of its own: the check exists only on this page, only from the tap, and a second tap while one is in flight is not a second request. | 通过 (结构) | `AboutViewModel` starts at `NotChecked` and only `checkForUpdates()` calls the one `ReleaseSource`; `AboutViewModelTest.a second tap while checking does not start a second request`; the merged manifest's only network-using permission is the one named above. **No packet capture was taken.** |
+| AC32 | — | The project is called SilverPhone in every place a name appears, in one pass and with no compatibility layer left behind. | 通过 | The renamed tree: root project, `namespace`/`applicationId` `com.silverphone.app`, packages, theme, `silverphone.db` and its schema directory, the archive's format marker and file prefix, the fixture, both READMEs and the release assets. `rg -i` over the tree matches the old name only in `IMPLEMENTATION-NOTES.md`'s account of the rename. |
 
 ## 2. Device and visual matrix
 
@@ -308,7 +342,10 @@ property, not a measurement, and it is not claimed as verified.
 **Claimed:** the app builds, installs on Android 6.0, stores and re-displays contacts and
 photos, presents one card per relative, produces a valid protocol-v1 archive, reads such
 an archive back and rejects the malformed variants, and refuses to dial when the
-permission is missing — all with automated tests or device evidence as listed above.
+permission is missing — all with automated tests or device evidence as listed above. The
+About screen shows the installed version and the project address, and the update check
+names the newest published release of this repository, or says honestly that it could not
+read one.
 
 **Not claimed, and not to be inferred from the above:**
 
@@ -319,6 +356,11 @@ permission is missing — all with automated tests or device evidence as listed 
 - that the system contacts import works against a real address book;
 - that a family can move contacts between two real phones;
 - that elderly users can use it;
+- that the update check was exercised on a real phone or over a carrier network: it was
+  driven by hand on the API 23 emulator, whose network is the host machine's;
+- that a release built by the workflow installs over an earlier one: both are signed with
+  the debug key, so Android refuses the update until the app is uninstalled (see
+  `docs/RELEASING.md`);
 - that the release APK is production-signed (it is signed with the debug key);
 - that performance targets on a 2 GB device are met.
 

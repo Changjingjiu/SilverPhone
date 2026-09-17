@@ -40,13 +40,20 @@ jobs:
       - name: Verify and build
         run: ./gradlew --no-daemon testDebugUnitTest lintDebug assembleDebug assembleRelease
 
-      - name: Upload the APKs
+      # One artifact per file, so the release job never has to guess how a
+      # multi-path upload flattened its directory structure.
+      - name: Upload the release APK
         uses: actions/upload-artifact@v7
         with:
-          name: silverphone-apk
-          path: |
-            app/build/outputs/apk/debug/app-debug.apk
-            app/build/outputs/apk/release/app-release.apk
+          name: silverphone-release-apk
+          path: app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
+
+      - name: Upload the debug APK
+        uses: actions/upload-artifact@v7
+        with:
+          name: silverphone-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
 
   # A tag is the release trigger, which is also what the in-app "Check for updates"
@@ -59,10 +66,16 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Download the APKs
+      - name: Download the release APK
         uses: actions/download-artifact@v8
         with:
-          name: silverphone-apk
+          name: silverphone-release-apk
+          path: apks
+
+      - name: Download the debug APK
+        uses: actions/download-artifact@v8
+        with:
+          name: silverphone-debug-apk
           path: apks
 
       - name: Publish the release

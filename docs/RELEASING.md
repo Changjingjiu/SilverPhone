@@ -41,8 +41,9 @@ git push origin v1.0.1
 
 ## 5. What CI does with the tag
 
-`.github/workflows/android.yml` builds and tests the tag, uploads both APKs as a
-workflow artifact, and then publishes a GitHub release named `v1.0.1` with:
+`.github/workflows/android.yml` builds and tests the tag, uploads both APKs as workflow
+artifacts (`silverphone-release-apk`, `silverphone-debug-apk`), and then publishes a
+GitHub release named `v1.0.1` with:
 
 | Asset | Source |
 |---|---|
