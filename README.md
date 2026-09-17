@@ -44,9 +44,10 @@
 Download the APK from [Releases](https://github.com/Changjingjiu/SilverPhone/releases/latest), or build it.
 
 **Coming from v1.0.1 or earlier: uninstall the app first.** Those builds were signed
-with a different key and Android will refuse to install over them. Uninstalling deletes
-the contacts stored in the app, so export them from *Family settings → Import or export*
-beforehand and import the file again afterwards. From v1.0.2 on, updates install normally.
+with the Android debug key and Android will refuse to install over them. Uninstalling
+deletes the contacts stored in the app, so export them from *Family settings → Import or
+export* beforehand and import the file again afterwards. Every release since then is
+signed with the project's own release key, so they update over each other normally.
 
 ```bash
 # needs JDK 17 and Android SDK 36

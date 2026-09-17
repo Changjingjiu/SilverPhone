@@ -43,9 +43,9 @@
 
 从 [Releases](https://github.com/Changjingjiu/SilverPhone/releases/latest) 下载 APK，或者自己构建。
 
-**从 v1.0.1 或更早版本升级的，要先卸载应用。** 那些包用的是另一把签名密钥，Android 不允许
+**从 v1.0.1 或更早版本升级的，要先卸载应用。** 那些包用的是 Android 调试密钥，Android 不允许
 覆盖安装。卸载会清空应用里的亲人，所以请先在**家属设置 → 导入 / 导出**里导出，装好之后再导入
-回来。v1.0.2 起可以正常覆盖升级。
+回来。之后的每个版本都用项目自己的发布密钥签名，可以正常互相覆盖升级。
 
 ```bash
 # 需要 JDK 17 和 Android SDK 36

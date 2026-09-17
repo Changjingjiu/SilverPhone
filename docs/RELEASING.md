@@ -9,8 +9,8 @@ the release job below has run.
 In `app/build.gradle.kts`:
 
 ```kotlin
-versionCode = 2        // +1 every release; the store and the phone compare this
-versionName = "1.0.1"  // the number the About screen shows and compares
+versionCode = 7        // +1 every release; the store and the phone compare this
+versionName = "1.0.7"  // the number the About screen shows and compares
 ```
 
 ## 2. Make the documents true again
@@ -56,11 +56,11 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 17)
 
 # gh does not rename an asset on upload: `path#label` only sets the label shown on the
 # page, and the file keeps its own name. Copy it to the name the release should carry.
-cp app/build/outputs/apk/release/app-release.apk /tmp/SilverPhone-v1.0.2.apk
+cp app/build/outputs/apk/release/app-release.apk /tmp/SilverPhone-v1.0.7.apk
 
-gh release create v1.0.2 /tmp/SilverPhone-v1.0.2.apk \
+gh release create v1.0.7 /tmp/SilverPhone-v1.0.7.apk \
   --verify-tag \
-  --title "SilverPhone v1.0.2" \
+  --title "SilverPhone v1.0.7" \
   --generate-notes \
   --notes "Signed with the SilverPhone release key (SHA-256 DF:EA:77:...:F4). A build signed with the debug key cannot be installed over: uninstall it first, which deletes the contacts inside, so export them from 家属设置 → 导入 / 导出 first."
 ```
@@ -77,17 +77,17 @@ factual.
 
 ```sh
 gh run watch                     # the run for the tag push
-gh release view v1.0.2 --web     # the assets the app will offer
+gh release view v1.0.7 --web     # the assets the app will offer
 curl -s https://api.github.com/repos/Changjingjiu/SilverPhone/releases/latest \
   | grep '"tag_name"'            # exactly what the About screen reads
 ```
 
 On a phone with the previous version installed, open **Family settings → About →
-Check for updates**: it must name `v1.0.2` and offer the download page.
+Check for updates**: it must name `v1.0.7` and offer the download page.
 
 ## Signing
 
-Since v1.0.2 the release build is signed with a real key. The three pieces:
+Since the first signed release the release build is signed with a real key. The three pieces:
 
 | | |
 |---|---|
@@ -107,10 +107,19 @@ Never publish one of those.
 ### v1.0.1 and earlier
 
 Those releases were signed with the Android debug key, which is a different key. A phone
-that has one of them installed must uninstall the app before installing v1.0.2 or later —
-which deletes the contacts stored in it, so use **家属设置 → 导入 / 导出** to export them
-first, and import the file after reinstalling. From v1.0.2 onward, updates install
-normally over each other.
+that has one of them installed must uninstall the app before installing a current
+release — which deletes the contacts stored in it, so use **家属设置 → 导入 / 导出** to
+export them first, and import the file after reinstalling. Every release signed with the
+project's own key updates normally over each other.
+
+### About the certificate fingerprint
+
+The release notes and this document quote the **certificate** SHA-256. That value is
+public by construction: it is embedded in every APK the project ships, and its only use
+here is to let someone check that a download was signed by this project rather than by
+somebody else. It cannot be used to sign anything. What must never leave the machine is
+the keystore file, its passwords, and `keystore.properties` — none of which are in the
+repository, and the audit in `acceptance-results.md` records how that was checked.
 
 Nothing in the app downloads or installs an APK by itself: the About screen only opens
 the release page in the browser.

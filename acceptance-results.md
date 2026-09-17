@@ -5,6 +5,35 @@ run**, on which target, and what was **not** run. Status values are only 通过 
 失败 (fail) / 未验证 (not verified). Reproducing a build is not evidence that a real
 phone call works.
 
+### Secret audit (2026-09-18, on the owner's request)
+
+The question behind it: is publishing the certificate fingerprint a leak, and has any key
+material ever reached the repository?
+
+| Check | Command | Result |
+|---|---|---|
+| Key material tracked now | `git ls-files | grep -iE "keystore|\.jks|\.p12|\.pem|local\.properties|\.env"` | nothing |
+| Key material ever added | `git log --all --diff-filter=A --name-only | grep -iE "keystore|\.jks|\.p12|\.pem"` | nothing |
+| The keystore password in any commit | `git log --all -S"<password>"` and a scan of every blob in every ref | 0 matches |
+| `keystore.properties` tracked | `git ls-files --error-unmatch keystore.properties` | error: not known to git (correct) |
+| Editor / tool state tracked | `git ls-files | grep -E "^\.mimosa|^\.v2c|^\.video_agent"` | nothing |
+| Helper scripts with a hard-coded key | `grep -nE "api_key|sk-|token|secret" tools/*` | only `os.environ.get("SILICONFLOW_API_KEY")` |
+| CI reaching for secrets | `grep -nE "secrets\.|PASSWORD" .github/workflows/*.yml` | nothing; CI never signs |
+
+**The fingerprint is not a secret.** `DF:EA:77:...:52:F4` is the digest of the public
+certificate, which is embedded in every APK the project ships; its only use is to let a
+downloader confirm that a file was signed by this project rather than by someone else.
+It cannot sign anything. The private key lives at `~/keystores/silverphone-release.jks`,
+outside the repository, and its passwords live in `keystore.properties`, which
+`.gitignore` excludes and which Git has never seen.
+
+**One thing worth doing anyway:** `keystore.properties` holds those passwords in clear
+text in the working tree, which is what the release procedure asks for but means the file
+has to be treated as a secret - it must not be pasted into an issue, a chat, or a
+screenshot. Rotating the passwords (`keytool -storepasswd` / `-keypasswd`, then updating
+the file) is safe for existing installs, because the certificate and therefore the app's
+signing identity stay the same.
+
 ## v1.0.6 release verification (2026-09-18)
 
 - Version `1.0.6` / version code `6`.
