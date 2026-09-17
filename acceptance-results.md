@@ -5,6 +5,28 @@ run**, on which target, and what was **not** run. Status values are only 通过 
 失败 (fail) / 未验证 (not verified). Reproducing a build is not evidence that a real
 phone call works.
 
+## v1.0.6 release verification (2026-09-18)
+
+- Version `1.0.6` / version code `6`.
+- What changed: a consistency audit of the whole interface, and the fixes it produced.
+  Text sizes, weights, corners, colours and element spacing now come from the theme
+  alone - the audit commands (`grep` for a literal `.sp`, a numeric
+  `RoundedCornerShape`, a raw `Color`, or a raw `padding`) return nothing under `ui/`
+  outside `ui/theme/`. The emphasis styles moved from SemiBold to Medium, the compact
+  row buttons now use the same label style and glyph size as every other button, and the
+  management list follows the platform's list grammar (tap opens, press and hold
+  selects) instead of having both a dead tap and a separate edit button.
+- `./gradlew testDebugUnitTest` - 通过 (104 tests, 0 failures).
+- `./gradlew connectedDebugAndroidTest` on `SilverPhone_API23` - 通过 (57 tests,
+  0 failures, 0 skipped).
+- `./gradlew lintDebug` - 通过 (0 errors).
+- `./gradlew assembleDebug assembleRelease` - 通过.
+- Manual pass on the emulator: the home screen, the management list, the import picker,
+  the editor and the About screen were each re-read after the weight change.
+- Screenshots in `design/screenshots/` were regenerated from this build.
+- 未验证: a real tablet or foldable (the two-pane layout was checked by resizing the
+  emulator display); landscape; the 大 / 特大 / 超大 presets after the weight change.
+
 ## v1.0.5 release verification (2026-09-18)
 
 - Version `1.0.5` / version code `5`, signed with the SilverPhone release key

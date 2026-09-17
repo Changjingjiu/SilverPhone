@@ -152,6 +152,7 @@ fun FilledActionButton(
     /** False paints the quiet tonal fill instead of the full-strength one. */
     emphasis: Boolean = true,
 ) {
+    val dimens = LocalAppDimens.current
     val styles = LocalAppTextStyles.current
     val container = when {
         danger -> AppColors.DangerRed
@@ -165,7 +166,7 @@ fun FilledActionButton(
     }
     val labelColor = when {
         !enabled -> AppColors.DisabledOnSurface
-        danger || emphasis -> Color.White
+        danger || emphasis -> AppColors.OnInk
         else -> AppColors.Ink
     }
 
@@ -195,7 +196,7 @@ fun FilledActionButton(
                 role = Role.Button,
                 onClick = onClick,
             )
-            .padding(horizontal = 20.dp, vertical = 10.dp),
+            .padding(horizontal = dimens.spaceLoose - dimens.spaceTight, vertical = dimens.spaceSnug),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
     ) {
@@ -205,10 +206,10 @@ fun FilledActionButton(
                 contentDescription = null,
                 tint = labelColor,
                 modifier = Modifier
-                    .size(20.dp)
+                    .size(dimens.controlGlyph)
                     .clearAndSetSemantics { },
             )
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(dimens.spaceSnug))
         }
         Text(text = text, style = styles.button, color = labelColor)
     }
@@ -226,6 +227,7 @@ fun QuietActionButton(
     enabled: Boolean = true,
     danger: Boolean = false,
 ) {
+    val dimens = LocalAppDimens.current
     val styles = LocalAppTextStyles.current
     val content = when {
         !enabled -> AppColors.DisabledOnSurface
@@ -255,7 +257,7 @@ fun QuietActionButton(
                 role = Role.Button,
                 onClick = onClick,
             )
-            .padding(horizontal = 14.dp),
+            .padding(horizontal = dimens.chipCorner),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
     ) {

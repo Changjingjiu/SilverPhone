@@ -210,7 +210,7 @@ internal fun PickBody(
                 end = dimens.pagePadding,
                 bottom = dimens.touchGap,
             ),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(LocalAppDimens.current.spaceSnug),
         ) {
             val visible = state.visible
             items(count = visible.size, key = { index -> visible[index].contact.id }) { index ->
@@ -303,7 +303,7 @@ private fun CandidateRow(
                     tint = AppColors.Ink,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(8.dp)
+                        .padding(dimens.spaceSnug)
                         .clearAndSetSemantics { },
                 )
             }
@@ -345,7 +345,7 @@ private fun CandidateRow(
                 QuietActionButton(
                     text = stringResource(R.string.contacts_number_picker_title),
                     onClick = onPickNumber,
-                    modifier = Modifier.padding(top = 2.dp),
+                    modifier = Modifier.padding(top = dimens.spaceTight),
                 )
             }
         }

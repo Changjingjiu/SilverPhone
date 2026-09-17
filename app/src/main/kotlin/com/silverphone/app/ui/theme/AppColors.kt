@@ -36,7 +36,10 @@ object AppColors {
      * room to spare.
      */
     val CallGreen = Color(0xFF15803D)
+
     val OnCallGreen = Color(0xFFFFFFFF)
+    /** The label colour on every dark fill in the app, so nothing off-theme slips in. */
+    val OnInk = Color(0xFFFFFFFF)
     val CancelRed = Color(0xFFB42318)
     val DangerRed = Color(0xFFB42318)
     val Outline = Color(0xFF64748B)

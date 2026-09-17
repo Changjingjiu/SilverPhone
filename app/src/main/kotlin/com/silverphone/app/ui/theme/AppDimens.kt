@@ -39,6 +39,10 @@ data class AppDimens(
     val rule: Dp,
     /** Corner of the tinted square that holds a row's glyph. */
     val chipCorner: Dp,
+    /** Corner of the small inline badge, one step tighter than a chip. */
+    val badgeCorner: Dp,
+    /** Glyph inside a family-facing control, so chips and buttons match. */
+    val controlGlyph: Dp,
     /** Side of that square, which also sets its glyph. */
     val chipSize: Dp,
     /** Side of the tinted circle behind a whole-screen message glyph. */
@@ -97,6 +101,8 @@ fun appDimens(preset: FontPreset): AppDimens {
         spaceLoose = 24.dp,
         rule = 4.dp,
         chipCorner = 14.dp,
+        badgeCorner = 8.dp,
+        controlGlyph = 20.dp,
         chipSize = chip,
         messageGlyph = 96.dp,
         photoCorner = 14.dp,

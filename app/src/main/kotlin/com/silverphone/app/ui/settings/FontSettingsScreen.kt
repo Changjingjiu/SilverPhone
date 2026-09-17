@@ -269,7 +269,7 @@ private fun PreviewCard() {
             .clip(shape)
             .background(AppColors.Surface)
             .border(1.dp, AppColors.Hairline, shape)
-            .padding(10.dp),
+            .padding(dimens.spaceSnug),
         verticalArrangement = Arrangement.spacedBy(dimens.spaceSnug),
     ) {
         // The face and the two text roles side by side rather than stacked. Stacked,
@@ -292,7 +292,7 @@ private fun PreviewCard() {
                         .clearAndSetSemantics { },
                 )
             }
-            Column(modifier = Modifier.padding(start = 10.dp)) {
+            Column(modifier = Modifier.padding(start = dimens.spaceSnug)) {
                 Text(
                     text = stringResource(R.string.font_preview_name),
                     style = styles.contactName,
@@ -324,7 +324,7 @@ private fun PreviewCard() {
                 text = stringResource(R.string.font_preview_button),
                 style = styles.button,
                 color = AppColors.OnCallGreen,
-                modifier = Modifier.padding(start = 10.dp),
+                modifier = Modifier.padding(start = dimens.spaceSnug),
             )
         }
     }

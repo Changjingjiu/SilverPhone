@@ -69,7 +69,7 @@ fun PrimaryActionButton(
         enabled = enabled,
         container = AppColors.Ink,
         containerPressed = AppColors.InkPressed,
-        content = Color.White,
+        content = AppColors.OnInk,
     )
 }
 
@@ -157,7 +157,7 @@ fun CompactActionButton(
                 role = Role.Button,
                 onClick = onClick,
             )
-            .padding(PaddingValues(horizontal = 8.dp, vertical = 4.dp)),
+            .padding(PaddingValues(horizontal = dimens.spaceSnug, vertical = dimens.spaceTight)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
     ) {
@@ -166,17 +166,17 @@ fun CompactActionButton(
             contentDescription = null,
             tint = contentColor,
             modifier = Modifier
-                .size(dimens.secondaryGlyph)
+                .size(dimens.controlGlyph)
                 .clearAndSetSemantics { },
         )
         Text(
             text = text,
-            style = styles.caption,
+            style = styles.button,
             color = contentColor,
             // Wraps rather than being cut mid-glyph: three of these share a row and
             // at 特大 the label no longer fits on one line.
             maxLines = 2,
-            modifier = Modifier.padding(start = 6.dp),
+            modifier = Modifier.padding(start = dimens.spaceSnug),
         )
     }
 }

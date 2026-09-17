@@ -231,7 +231,7 @@ private fun PreviewBody(
             .fillMaxSize()
             .padding(horizontal = dimens.pagePadding),
         contentPadding = PaddingValues(vertical = dimens.touchGap),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+        verticalArrangement = Arrangement.spacedBy(LocalAppDimens.current.spaceTight),
     ) {
         item {
             SectionCard {

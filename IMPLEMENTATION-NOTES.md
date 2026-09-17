@@ -110,6 +110,26 @@ Every animation in the app is short and answers something the hand just did:
 No animation runs longer than 220 ms, none of them loops, and none of them is the only
 way to know that something happened.
 
+### One design, six rules
+
+The owner asked for an audit of the whole interface: sizes, look, corners, colours,
+interaction and weight, so that the app does not read as several apps stitched together.
+The audit produced these rules, and the code now obeys them everywhere:
+
+| Rule | What is allowed | How it is enforced |
+|---|---|---|
+| Text size | The six roles in `AppTypography` (20 / 16 / 14 / 14 / 12 sp) | Nothing under `ui/` sets a size: `grep -rE "[0-9]+\.sp" ui/` finds nothing outside the theme |
+| Weight | Medium for the four emphasis roles, Normal for body and caption | One `fontWeight` per role in `AppTypography`; the first build used SemiBold and read as shouting |
+| Corners | Card 20 dp, chip 14 dp, badge 8 dp, controls stadium | `AppDimens` carries all four; no literal `RoundedCornerShape(<number>)` is left under `ui/` |
+| Colour | The `AppColors` palette only | No `Color(0x…)`, `Color.White` or `Color.Black` under `ui/` outside the theme |
+| Spacing | 4 / 8 / 12 / 16 / 24 dp between elements | Every `padding`/`spacedBy` reads an `AppDimens` field; component sizes (a 64 dp thumbnail) are the only literals left |
+| Interaction | Tap opens, press and hold selects, destructive actions confirm, save lives in the bar | The management list and the import picker now answer a tap the same way, and the editor, the text-size page and the language page all keep Save in the same corner |
+
+Two deliberate exceptions, both about the person using the phone rather than the person
+setting it up: the home screen's dial area keeps its 64 dp height and its 40 dp handset,
+and the whole-screen help and empty states use the same oversized button. Everything the
+family touches is ordinary app sized.
+
 ### Two rules the layout is checked against
 
 Both came out of the owner reading a screenshot of the two-pane layout and pointing at

@@ -36,6 +36,7 @@
 - **Two apps in one.** The call screen is built around the person using it; every family screen is an ordinary Android app, with a compact bar, one-line rows and no oversized buttons.
 - **Adapts to the screen it is on.** On a phone the family menu opens one screen at a time; on a tablet or a foldable the menu stays beside the screen it opened (Material 3 `ListDetailPaneScaffold`, window size classes rather than device checks).
 - **Every tap answers back**: pressed controls darken, shrink and spring, with a short tick.
+- **One design, not several.** Six roles of text, four corner sizes, one palette, one spacing scale, one weight per role — and the same gestures everywhere: tap a row to open it, press and hold to select, destructive actions always ask first, Save always in the same corner.
 - **No account, no ads, no analytics.** The app's only network request is the manual "check for updates".
 
 ## Getting started

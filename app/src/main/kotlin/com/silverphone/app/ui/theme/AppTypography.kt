@@ -12,6 +12,11 @@ import com.silverphone.app.domain.FontPreset
 /**
  * The role-based text styles, at the sizes the 1.0 preset uses.
  *
+ * Two rules keep the app from looking like several apps: every style below is one of
+ * six roles (nothing in `ui/` sets its own size or weight), and the emphasis roles are
+ * Medium rather than SemiBold, which is what the owner asked for after reading the
+ * first build - the heavier weight made ordinary labels shout.
+ *
  * The 1.0 preset is the ordinary size text has on a phone: 20 sp for a screen title,
  * 16 sp for the name on a card, 14 sp for body text and buttons, 12 sp for the small
  * print. It is the default because a page whose every line is already enlarged is a
@@ -44,21 +49,21 @@ fun appTextStyles(preset: FontPreset): AppTextStyles {
     return AppTextStyles(
         pageTitle = TextStyle(
             fontFamily = FontFamily.SansSerif,
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.Medium,
             fontSize = (PAGE_TITLE_BASE_SP * ratio).sp,
             lineHeight = (PAGE_TITLE_BASE_SP * ratio * 1.35f).sp,
             letterSpacing = 0.sp,
         ),
         contactName = TextStyle(
             fontFamily = FontFamily.SansSerif,
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.Medium,
             fontSize = (CONTACT_NAME_BASE_SP * ratio).sp,
             lineHeight = (CONTACT_NAME_BASE_SP * ratio * 1.35f).sp,
             letterSpacing = 0.sp,
         ),
         button = TextStyle(
             fontFamily = FontFamily.SansSerif,
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.Medium,
             fontSize = (BUTTON_BASE_SP * ratio).sp,
             lineHeight = (BUTTON_BASE_SP * ratio * 1.3f).sp,
             letterSpacing = 0.sp,
@@ -79,7 +84,7 @@ fun appTextStyles(preset: FontPreset): AppTextStyles {
         // "a sentence" without changing the size or the weight.
         section = TextStyle(
             fontFamily = FontFamily.SansSerif,
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.Medium,
             fontSize = (CAPTION_BASE_SP * ratio).sp,
             lineHeight = (CAPTION_BASE_SP * ratio * 1.3f).sp,
             letterSpacing = 0.6.sp,

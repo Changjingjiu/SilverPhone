@@ -238,7 +238,7 @@ private fun FamilyEntry(label: String, onClick: () -> Unit) {
                 onClick = onClick,
             )
             .heightIn(min = 44.dp)
-            .padding(start = 4.dp, end = 12.dp, top = 4.dp, bottom = 4.dp),
+            .padding(start = dimens.spaceTight, end = dimens.touchGap, top = dimens.spaceTight, bottom = dimens.spaceTight),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
@@ -437,7 +437,7 @@ private fun HandingOffNotice() {
                 .background(AppColors.Surface)
                 .border(1.dp, AppColors.Hairline, shape)
                 .semantics(mergeDescendants = true) { contentDescription = label }
-                .padding(horizontal = 24.dp, vertical = 20.dp),
+                .padding(horizontal = dimens.spaceLoose, vertical = dimens.spaceRoomy),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             CircularProgressIndicator(

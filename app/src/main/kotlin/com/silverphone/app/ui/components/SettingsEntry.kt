@@ -116,7 +116,7 @@ fun SettingsEntry(
                 text = description,
                 style = styles.caption,
                 color = AppColors.TextSecondary,
-                modifier = Modifier.padding(top = 2.dp),
+                modifier = Modifier.padding(top = dimens.spaceTight),
             )
         }
         Spacer(Modifier.width(dimens.spaceSnug))

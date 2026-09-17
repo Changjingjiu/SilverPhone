@@ -133,7 +133,7 @@ fun PhotoCropScreen(
                     text = stringResource(R.string.crop_loading),
                     style = styles.body,
                     color = AppColors.TextSecondary,
-                    modifier = Modifier.padding(top = 96.dp),
+                    modifier = Modifier.padding(top = LocalAppDimens.current.messageGlyph),
                 )
             }
             if (failed) {

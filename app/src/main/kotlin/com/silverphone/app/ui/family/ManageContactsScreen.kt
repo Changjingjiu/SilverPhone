@@ -75,8 +75,12 @@ private val THUMB_SIZE = 64.dp
  * S04: the management list.
  *
  * Rows show the photo, the name the elderly user sees, and the full number, so a
- * family member can check the number at a glance. Nothing on this screen dials:
- * the only actions are edit, reorder and add.
+ * family member can check the number at a glance. Nothing on this screen dials.
+ *
+ * The row follows the platform's own list grammar, which is also what the import
+ * picker uses: **tap a row to open it, press and hold to start selecting**. The first
+ * build had a tap that did nothing and a separate 修改 button, which meant two screens
+ * in the same app answered the same gesture differently.
  */
 @Composable
 fun ManageContactsScreen(
@@ -236,11 +240,11 @@ fun ManageContactsScreen(
                         selected = contact.id in state.selected,
                         onLongPress = { onLongPress(contact.id) },
                         onToggleSelected = { onToggleSelected(contact.id) },
+                        onOpen = { onEdit(contact.id) },
                         // Reordering follows the stored order, so it is disabled
                         // while a search is narrowing the list.
                         canMoveUp = !state.isSearching && index > 0,
                         canMoveDown = !state.isSearching && index < state.contacts.lastIndex,
-                        onEdit = { onEdit(contact.id) },
                         onMoveUp = { onMove(contact.id, MoveDirection.UP) },
                         onMoveDown = { onMove(contact.id, MoveDirection.DOWN) },
                     )
@@ -333,10 +337,10 @@ fun ManageContactsScreen(
 /**
  * One row of the management list.
  *
- * The photo, name and full number get the whole width, and the labelled actions
- * sit on their own line underneath, divided off by a hairline. Putting the actions
- * beside the text squeezed the number onto two lines, which is exactly the kind of
- * thing a family member needs to be able to read at a glance.
+ * The photo, name and full number get the whole width, and the two reorder controls
+ * sit on their own line underneath, divided off by a hairline. Editing is the row's own
+ * tap; keeping a third button for it made the row look like a toolbar and squeezed the
+ * number onto two lines.
  */
 @Composable
 private fun ContactRow(
@@ -346,9 +350,9 @@ private fun ContactRow(
     selected: Boolean,
     onLongPress: () -> Unit,
     onToggleSelected: () -> Unit,
+    onOpen: () -> Unit,
     canMoveUp: Boolean,
     canMoveDown: Boolean,
-    onEdit: () -> Unit,
     onMoveUp: () -> Unit,
     onMoveDown: () -> Unit,
 ) {
@@ -367,7 +371,7 @@ private fun ContactRow(
                 shape = shape,
             )
             .combinedClickable(
-                onClick = { if (selecting) onToggleSelected() },
+                onClick = { if (selecting) onToggleSelected() else onOpen() },
                 onLongClick = onLongPress,
                 role = Role.Button,
             )
@@ -420,9 +424,9 @@ private fun ContactRow(
                         color = AppColors.DangerRed,
                         modifier = Modifier
                             .padding(top = dimens.spaceTight)
-                            .clip(RoundedCornerShape(6.dp))
+                            .clip(RoundedCornerShape(dimens.badgeCorner))
                             .background(AppColors.DangerSoft)
-                            .padding(horizontal = 6.dp, vertical = 2.dp),
+                            .padding(horizontal = dimens.spaceSnug, vertical = dimens.spaceTight),
                     )
                 }
             }
@@ -452,12 +456,6 @@ private fun ContactRow(
                 icon = Icons.Filled.KeyboardArrowDown,
                 enabled = canMoveDown,
                 onClick = onMoveDown,
-                modifier = Modifier.weight(1f),
-            )
-            CompactActionButton(
-                text = stringResource(R.string.manage_edit),
-                icon = Icons.Filled.Edit,
-                onClick = onEdit,
                 modifier = Modifier.weight(1f),
             )
         }
