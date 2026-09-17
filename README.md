@@ -289,7 +289,8 @@ app/src/main/kotlin/com/silverphone/app/
 └── ui/             one package per screen, plus theme and shared components
 ```
 
-Around the module: the five requirement documents in [`docs/spec/`](docs/spec), the
+Around the module: the requirement documents `00`–`04` and the design specification
+`05` that was derived from them, in [`docs/spec/`](docs/spec), the
 release procedure in [`docs/RELEASING.md`](docs/RELEASING.md), the build and release
 workflow in [`.github/workflows/`](.github/workflows), the generated sample archive in
 `design/fixtures/`, and the screenshots in `design/screenshots/`.

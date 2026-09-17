@@ -235,7 +235,7 @@ app/src/main/kotlin/com/silverphone/app/
 └── ui/             一个页面一个包，加上主题和共用组件
 ```
 
-模块之外：五份需求文档在 [`docs/spec/`](docs/spec)，发布流程在
+模块之外：需求文档 `00`～`04` 和由它们整理出的设计规格 `05` 在 [`docs/spec/`](docs/spec)，发布流程在
 [`docs/RELEASING.md`](docs/RELEASING.md)，构建与发布的流水线在
 [`.github/workflows/`](.github/workflows)，生成的示例压缩包在 `design/fixtures/`，
 截图在 `design/screenshots/`。
