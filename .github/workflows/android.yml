@@ -56,43 +56,11 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
 
-  # A tag is the release trigger, which is also what the in-app "Check for updates"
-  # reads: it asks GitHub for the newest published release, not for the newest tag.
-  release:
-    needs: build
-    if: github.ref_type == 'tag'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: write
-    steps:
-      # gh --generate-notes reads the commit history between tags, so this job
-      # needs the repository itself, with the tags, not just the artifacts.
-      - name: Check out
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-
-      - name: Download the release APK
-        uses: actions/download-artifact@v8
-        with:
-          name: silverphone-release-apk
-          path: apks
-
-      # One asset, the release APK. The debug APK stays in the build job's artifacts:
-      # a release page is what a family downloads from, and a second package there
-      # only asks them to pick the wrong file.
-      - name: Publish the release
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-        run: |
-          set -euo pipefail
-          version="${GITHUB_REF_NAME}"
-          cp apks/app-release.apk "SilverPhone-${version}.apk"
-          gh release create "${version}" \
-            "SilverPhone-${version}.apk" \
-            --verify-tag \
-            --title "SilverPhone ${version}" \
-            --notes "Installs over an older SilverPhone build only if that build was signed with the same key. This APK is signed with the Android debug key, so it is a test build: uninstall the app before installing it, or sign future releases with the same key. See docs/RELEASING.md." \
-            --generate-notes
+  # Publishing is not done here.
+  #
+  # The release APK must be signed with the SilverPhone release key, and that key is
+  # deliberately not in CI: it is the one secret that cannot be rotated, and anything
+  # that can read it can sign an update for every installed copy of this app. A tag
+  # therefore only builds and tests, and the release is published from the machine that
+  # holds the key - see docs/RELEASING.md. A run of this workflow is still the proof
+  # that the tagged tree compiles and passes its tests.

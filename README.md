@@ -36,7 +36,12 @@
 
 ## Getting started
 
-Download the APK from [Releases](https://github.com/Changjingjiu/SilverPhone/releases/latest), or build it:
+Download the APK from [Releases](https://github.com/Changjingjiu/SilverPhone/releases/latest), or build it.
+
+**Coming from v1.0.1 or earlier: uninstall the app first.** Those builds were signed
+with a different key and Android will refuse to install over them. Uninstalling deletes
+the contacts stored in the app, so export them from *Family settings → Import or export*
+beforehand and import the file again afterwards. From v1.0.2 on, updates install normally.
 
 ```bash
 # needs JDK 17 and Android SDK 36
@@ -83,12 +88,12 @@ More screens, both languages, in [`design/screenshots/`](design/screenshots).
 | Requirements | Android 6.0+ (API 23). No Google services, no account. |
 | Permissions | `CALL_PHONE`, `READ_CONTACTS` — each asked for at the moment it is used — and `INTERNET`, used only by the manual update check. |
 | Build | JDK 17 and Android SDK 36. `./gradlew assembleDebug` |
-| Tests | `./gradlew testDebugUnitTest` (84) · `./gradlew connectedDebugAndroidTest` (48) |
+| Tests | `./gradlew testDebugUnitTest` (104) · `./gradlew connectedDebugAndroidTest` (51) |
 | Documents | [docs/spec](docs/spec) — the four specification documents · [IMPLEMENTATION-NOTES.md](IMPLEMENTATION-NOTES.md) · [acceptance-results.md](acceptance-results.md) · [build-matrix.md](build-matrix.md) · [docs/RELEASING.md](docs/RELEASING.md) · [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) |
 
 **Not built on purpose:** accounts, sync, servers, cloud backup, analytics, ads, crash reporting; app-store publishing; video calls; messaging; multiple profiles; a call log; a dial pad; calling from the lock screen.
 
-**Known limits:** the import preview holds an archive's photos in memory, so a very large archive on a low-memory phone can fail — nothing is written until the import commits, so a failure means starting the import again. The released APK is signed with the Android debug key: it installs and updates normally while the key stays the same, but a future switch to a real release key means uninstalling first.
+**Known limits:** the import preview holds an archive's photos in memory, so a very large archive on a low-memory phone can fail — nothing is written until the import commits, so a failure means starting the import again. Releases are signed with the SilverPhone release key; the certificate's SHA-256 is in [docs/RELEASING.md](docs/RELEASING.md) if you want to check a download.
 
 ## License
 

@@ -7,6 +7,12 @@ app/build/
 # Local machine configuration. Holds the SDK path for this machine only.
 local.properties
 
+# Release signing. The keystore itself is kept outside the repository, so a stray
+# `git add -A` cannot publish the key that signs installable builds.
+keystore.properties
+*.jks
+*.keystore
+
 # IDE
 .idea/
 *.iml

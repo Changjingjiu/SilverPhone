@@ -1,3 +1,4 @@
+import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -9,6 +10,15 @@ plugins {
     alias(libs.plugins.room)
 }
 
+// The release signing key. It lives outside the repository and is described by
+// keystore.properties, which is git-ignored. See docs/RELEASING.md.
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties().apply {
+    if (keystorePropertiesFile.exists()) {
+        keystorePropertiesFile.inputStream().use { load(it) }
+    }
+}
+
 android {
     namespace = "com.silverphone.app"
     compileSdk = 36
@@ -18,10 +28,21 @@ android {
         // Product contract: Android 6.0 / API 23 must keep working. Do not raise.
         minSdk = 23
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.0.1"
+        versionCode = 3
+        versionName = "1.0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        if (keystorePropertiesFile.exists()) {
+            create("release") {
+                storeFile = file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
+        }
     }
 
     buildTypes {
@@ -36,10 +57,19 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            // No production keystore is available in this task. The release build is
-            // therefore signed with the debug key and must be treated as a TEST build,
-            // not a store-signed release. See README "Known limitations".
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (keystorePropertiesFile.exists()) {
+                signingConfigs.getByName("release")
+            } else {
+                // A fresh clone, or CI, has no key. The build still runs so it can be
+                // compiled and tested anywhere, but the APK it produces is signed with
+                // the debug key and must never be published: Android refuses to install
+                // it over a properly signed build, and the reverse is just as bad.
+                logger.warn(
+                    "keystore.properties is missing: app-release.apk will be signed with " +
+                        "the debug key and must not be published. See docs/RELEASING.md.",
+                )
+                signingConfigs.getByName("debug")
+            }
         }
     }
 

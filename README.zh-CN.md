@@ -36,7 +36,11 @@
 
 ## 如何开始
 
-从 [Releases](https://github.com/Changjingjiu/SilverPhone/releases/latest) 下载 APK，或者自己构建：
+从 [Releases](https://github.com/Changjingjiu/SilverPhone/releases/latest) 下载 APK，或者自己构建。
+
+**从 v1.0.1 或更早版本升级的，要先卸载应用。** 那些包用的是另一把签名密钥，Android 不允许
+覆盖安装。卸载会清空应用里的亲人，所以请先在**家属设置 → 导入 / 导出**里导出，装好之后再导入
+回来。v1.0.2 起可以正常覆盖升级。
 
 ```bash
 # 需要 JDK 17 和 Android SDK 36
@@ -83,12 +87,12 @@
 | 系统要求 | Android 6.0+（API 23），不需要 Google 服务，不需要账号 |
 | 权限 | `CALL_PHONE`、`READ_CONTACTS`（都在用到的那一刻申请）、`INTERNET`（只用于手动检查更新） |
 | 构建 | JDK 17 和 Android SDK 36；`./gradlew assembleDebug` |
-| 测试 | `./gradlew testDebugUnitTest`（84 个）· `./gradlew connectedDebugAndroidTest`（48 个） |
+| 测试 | `./gradlew testDebugUnitTest`（104 个）· `./gradlew connectedDebugAndroidTest`（51 个） |
 | 文档 | [docs/spec](docs/spec) 四份设计文档 · [IMPLEMENTATION-NOTES.md](IMPLEMENTATION-NOTES.md) · [acceptance-results.md](acceptance-results.md) · [build-matrix.md](build-matrix.md) · [docs/RELEASING.md](docs/RELEASING.md) · [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) |
 
 **故意不做的**：账号、同步、服务器、云备份、统计、广告、崩溃上报；上架应用商店；视频通话；消息；多用户档案；通话记录；拨号盘；从锁屏拨号。
 
-**已知限制**：导入预览会把压缩包里的照片读进内存，低内存机型遇到超大压缩包可能失败——提交之前不写入任何数据，失败了重新导入即可。发布用的 APK 目前用 Android debug 密钥签名：密钥不变时可以正常覆盖升级，将来换成正式密钥需要先卸载再装。
+**已知限制**：导入预览会把压缩包里的照片读进内存，低内存机型遇到超大压缩包可能失败——提交之前不写入任何数据，失败了重新导入即可。正式包用 SilverPhone 的发布密钥签名，证书 SHA-256 记在 [docs/RELEASING.md](docs/RELEASING.md)，可以用来核对下载到的包。
 
 ## 许可
 
