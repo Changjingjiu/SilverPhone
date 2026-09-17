@@ -285,6 +285,50 @@ What the new screen cost, and what was found while building it:
 | 52 | A release tag compared as text sorts before it compares as a version: `v1.10.0` sorts before `v1.9.0`, so the screen would have called a months-old release the newest one. | Written as unit tests before the comparison was used anywhere. | `AppVersion` compares components as numbers, and treats a pre-release suffix - the debug build ships as `1.0.0-debug` - as older than the release with the same number. |
 | 53 | **The instrumented suite went red twice in a row** while the API 23 AVD was still finishing a cold first boot: once as a failed `AboutScreenTest` assertion, once as a killed instrumentation process during `PhotoNormalizerTest`. Both runs named a different test, and both runs reported one failure with the process dying immediately afterwards. | Kept because a red run that is explained away is worth less than one that is explained: the same suite then passed 51/51 twice on the booted emulator, and `AboutScreenTest` passed 3/3 on its own in between. | Nothing in the app. The run of record is on a device whose boot animation has stopped; the two red runs are recorded here so the sequence is not hidden. |
 
+#### The release itself
+
+The workflow took three tagged runs to publish a release. The two failures are recorded
+because the third one is only evidence if the first two are visible:
+
+| Run | Result | What failed | Fix |
+|---|---|---|---|
+| `35206887053` (`v1.0.0`) | build ✓, release ✗ | A two-path artifact upload stores the APKs as `release/app-release.apk` and `debug/app-debug.apk`, so the release job's `cp apks/app-release.apk` found nothing. | One artifact per APK. |
+| `35207653502` (`v1.0.0`) | build ✓, release ✗ | `gh release create --generate-notes` reads the tag history and the release job had never checked the repository out: `fatal: not a git repository`. | `actions/checkout` with `fetch-depth: 0` in the release job. |
+| `35207809791` (`v1.0.0`) | **success** | — | — |
+
+The same workflow passed on `main` (`35207800394`) on a clean GitHub runner, which is
+evidence that `testDebugUnitTest`, `lintDebug`, `assembleDebug` and `assembleRelease` do
+not depend on this machine's SDK installation or Gradle cache.
+
+The published release:
+
+| Item | Value |
+|---|---|
+| Release | `v1.0.0`, marked Latest, published 2026-09-17 |
+| Assets | `SilverPhone-v1.0.0.apk` (2,694,130 bytes) and `SilverPhone-v1.0.0-debug.apk` — both signed with a debug key, so both are test builds |
+| What the app reads | `GET https://api.github.com/repos/Changjingjiu/SilverPhone/releases/latest` → `tag_name: v1.0.0`, `html_url: .../releases/tag/v1.0.0` |
+
+#### The update check, end to end, on the emulator
+
+Installed from the APK downloaded **from that release**, not from a local build
+(`shasum -a 256` → `9085db5da47dd23ccfca2645b6a3077b529eac7d716bba3c85fb7e8789bf370e`):
+
+| When | Installed build | What the screen said |
+|---|---|---|
+| Before any release existed | `1.0.0-debug` | `目前还没有发布可以下载的版本。` with a button to the releases page — the 404 path, seen on the device rather than only in a unit test |
+| After `v1.0.0` was published | `1.0.0` | `已经是最新版本。` |
+
+`design/screenshots/05-family-settings-zh.png` (About is the seventh and last row),
+`design/screenshots/14-about-zh.png` (version, GitHub address, check button, privacy) and
+`design/screenshots/15-about-update-check-zh.png` (the answer after a real check) are from
+that run.
+
+One thing the device said, which the release procedure now states as observed rather than
+assumed: installing the release APK over an earlier build of the same package that had
+been signed with a *different* debug key failed with `INSTALL_FAILED_UPDATE_INCOMPATIBLE`,
+and the older build had to be uninstalled first. Nothing in the app downloads or installs
+an APK by itself; the check only opens the release page.
+
 ## 1. Core acceptance criteria
 
 | # | Covers | What was done | Status | Evidence |

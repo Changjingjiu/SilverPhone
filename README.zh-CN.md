@@ -89,6 +89,11 @@
 | <img src="design/screenshots/10-language-and-code-zh.png" width="220"> | <img src="design/screenshots/12-call-permission-en.png" width="220"> | <img src="design/screenshots/13-calling-help-zh.png" width="220"> |
 | 每种语言用它自己的文字写；区号栏会实时显示实际拨出去的号码。 | 在按下的那一刻申请，不另设页面。 | 应用管什么、系统电话页面管什么。 |
 
+| 关于 | 检查更新之后 |
+|:---:|:---:|
+| <img src="design/screenshots/14-about-zh.png" width="220"> | <img src="design/screenshots/15-about-update-check-zh.png" width="220"> |
+| 版本号、能点的 GitHub 地址、检查更新和隐私说明。 | 手机上已经是最新版本时，按“检查更新”得到的回答。 |
+
 **关于**（家属设置里最后一项）回答家属用起来之后才会问的四件事：装的是哪个版本、项目在哪儿、
 有没有新版本、以及这个应用会拿亲人资料做什么。版本号直接读安装包本身，不会和实际装的对不上；
 地址以文字显示，点了用浏览器打开；“检查更新”是整个应用唯一联网的地方，而且只有点了才会联网。
@@ -139,6 +144,12 @@ export ANDROID_HOME=$HOME/Library/Android/sdk
 
 **仓库里没有生产签名密钥。** release 包现在用 debug 密钥签名，所以它是测试包，不是能上架的包；
 真要发布，先把 `app/build.gradle.kts` 里的 `signingConfig` 换掉。
+
+带 tag 的版本由 CI 自动构建并发布在
+<https://github.com/Changjingjiu/SilverPhone/releases>，“关于”页里的检查更新就是把人送到这里。
+这些包是 debug 签名的：如果手机上装的旧包是用另一个密钥签的，直接覆盖安装会失败
+（`INSTALL_FAILED_UPDATE_INCOMPATIBLE`），必须先卸载旧包——而卸载会删掉里面的亲人资料，
+所以更新前先导出。完整步骤见 [docs/RELEASING.md](docs/RELEASING.md)。
 
 `minSdk` 是 23（Android 6.0），不能往上调——产品契约把它定死了。哪些依赖被压在较低的版本、
 为什么，见 [`build-matrix.md`](build-matrix.md)：有几个更新版本的 AndroidX 声明了更高的

@@ -116,6 +116,11 @@ not part of the contact data.
 | <img src="design/screenshots/10-language-and-code-zh.png" width="220"> | <img src="design/screenshots/12-call-permission-en.png" width="220"> | <img src="design/screenshots/13-calling-help-zh.png" width="220"> |
 | Each language is named in its own language; the code field previews the number it will dial. | Asked for at the moment of the press, never on a separate page. | What the app does, and what the system phone screen controls instead. |
 
+| About | After a check |
+|:---:|:---:|
+| <img src="design/screenshots/14-about-zh.png" width="220"> | <img src="design/screenshots/15-about-update-check-zh.png" width="220"> |
+| Version, the GitHub address as text that can be tapped, the update check, and the privacy statement. | What "Check for updates" answers on a phone that already has the newest release. |
+
 **About** (the last entry in family settings) carries the four things a family member
 asks about once the app is working: which version is installed, where the project lives,
 whether a newer release exists, and what the app does with their data. The version comes
@@ -173,6 +178,14 @@ export ANDROID_HOME=$HOME/Library/Android/sdk
 **There is no production signing key in this repository.** The release build is signed
 with the debug key, so it is a test build and not something to publish. Replace the
 `signingConfig` in `app/build.gradle.kts` before a real release.
+
+Tagged versions are built and published by CI at
+<https://github.com/Changjingjiu/SilverPhone/releases>, which is also where the About
+screen's update check sends a family member. Because those APKs are debug-signed,
+installing one over a build signed with a different key fails with
+`INSTALL_FAILED_UPDATE_INCOMPATIBLE` — the older build has to be uninstalled first, which
+deletes the contacts stored in it, so export before updating. The steps are in
+[docs/RELEASING.md](docs/RELEASING.md).
 
 `minSdk` is 23 (Android 6.0) and must not be raised: the product contract fixes it.
 `build-matrix.md` records which dependency versions are held back and why — several
