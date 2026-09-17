@@ -26,6 +26,10 @@ phone call works.
 - Manual pass on the emulator at 411 dp: long-press selection, the delete confirmation,
   the contacts-import picker, the About screen, and the editor were each opened and
   read at both the standard text size and system font scale 1.3.
+- Published as a GitHub release: tag `v1.0.5`, one asset `SilverPhone-v1.0.5.apk`
+  (2 804 135 bytes, SHA-256 `29099f9a…fc4916f`). The release's own asset digest matches
+  the local APK, and the authenticated `releases/latest` call - the one the About screen
+  reads - reports `v1.0.5`.
 - 未验证: a real tablet or foldable (the two-pane layout was checked by resizing the
   emulator display, not on tablet hardware); landscape; the 大 / 特大 / 超大 presets after
   the type-scale change; a real phone call.
