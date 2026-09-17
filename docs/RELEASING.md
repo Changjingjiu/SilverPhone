@@ -54,12 +54,15 @@ Publish from the machine that holds the key, using the APK built from the tag:
 export JAVA_HOME=$(/usr/libexec/java_home -v 17)
 ./gradlew clean assembleRelease
 
-gh release create v1.0.2 \
-  "app/build/outputs/apk/release/app-release.apk#SilverPhone-v1.0.2.apk" \
+# gh does not rename an asset on upload: `path#label` only sets the label shown on the
+# page, and the file keeps its own name. Copy it to the name the release should carry.
+cp app/build/outputs/apk/release/app-release.apk /tmp/SilverPhone-v1.0.2.apk
+
+gh release create v1.0.2 /tmp/SilverPhone-v1.0.2.apk \
   --verify-tag \
   --title "SilverPhone v1.0.2" \
   --generate-notes \
-  --notes "Signed with the SilverPhone release key (SHA-256 DF:EA:77:...:F4). An older build signed with the debug key cannot be updated over: uninstall it first, which deletes the contacts inside it, so export them from 家属设置 → 导入 / 导出 first."
+  --notes "Signed with the SilverPhone release key (SHA-256 DF:EA:77:...:F4). A build signed with the debug key cannot be installed over: uninstall it first, which deletes the contacts inside, so export them from 家属设置 → 导入 / 导出 first."
 ```
 
 One asset, the release APK. The debug APK stays in the build job's artifacts: a release
