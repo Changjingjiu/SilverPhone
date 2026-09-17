@@ -4,6 +4,18 @@ Recorded: 2026-09-17. Every line states **what was actually run**, on which targ
 what was **not** run. Status values are only 通过 (pass) / 失败 (fail) / 未验证 (not
 verified). Reproducing a build is not evidence that a real phone call works.
 
+## v1.0.1 release verification (2026-09-17)
+
+- Version: `1.0.1` / version code `2`. No application behaviour changes since
+  `v1.0.0`; this release includes README, screenshot and specification-path cleanup.
+- JDK 17: `./gradlew testDebugUnitTest lintDebug assembleDebug assembleRelease`
+  completed successfully. Gradle reused up-to-date outputs; the unit-test report
+  contains 104 tests, 0 failures, 0 errors and 0 skipped tests.
+- No device or emulator was connected during this release check, so instrumented
+  tests and installation were not rerun. The 51-test result below is earlier evidence.
+- Release APK remains debug-signed and is a test distribution. Update compatibility
+  depends on matching signing certificates; real-device calling remains unverified.
+
 ## 0. Test and build summary
 
 | Suite | Command | Target | Result |
