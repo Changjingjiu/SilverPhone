@@ -2,8 +2,7 @@
 
 [English](README.en.md) · **简体中文**
 
-<img src="design/screenshots/01-home-zh.png" width="248" alt="中文首页：三位亲人，每人一张照片和一个绿色拨打按钮">
-<img src="design/screenshots/02-home-en.png" width="248" alt="英文首页：同样的三位亲人">
+<img src="design/hero/hero-zh.png" width="100%" alt="SilverPhone：左边写着「点一下照片，电话就拨出去」，右边两台手机分别显示亲人首页和家属设置页">
 
 # SilverPhone
 

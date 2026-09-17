@@ -2,8 +2,7 @@
 
 **English** · [简体中文](README.md)
 
-<img src="design/screenshots/01-home-zh.png" width="248" alt="Home screen in Chinese: three relatives, each with a photo and a green Call button">
-<img src="design/screenshots/02-home-en.png" width="248" alt="Home screen in English: the same three relatives">
+<img src="design/hero/hero-en.png" width="100%" alt="SilverPhone: “Press a photo. It dials.” on the left, with two phones showing the home screen and the family settings screen on the right">
 
 # SilverPhone
 
