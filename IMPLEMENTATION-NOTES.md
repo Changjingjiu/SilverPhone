@@ -185,8 +185,7 @@ destination rather than a destination of its own: back there popped the only ent
 graph and dropped the user onto the phone's home screen, which looks like a crash. A
 `BackHandler` now closes the help instead.
 
-Each screen also offers an explicit button back to its parent (`返回` / `取消`), listed in
-`README.md`.
+Each screen also offers an explicit button back to its parent (`返回` / `取消`).
 
 ## The stored language has to be applied, not just stored
 

@@ -15,7 +15,7 @@ versionName = "1.0.1"  // the number the About screen shows and compares
 
 ## 2. Make the documents true again
 
-- `README.md` (Chinese, the default) and `README.en.md` (English): feature list,
+- `README.md` (English, the default) and `README.zh-CN.md` (Chinese): feature list,
   permissions, test counts. Both are written in their own language; neither is a
   translation of the other.
 - `docs/spec/05_设计规格.md`: the acceptance-case list, if behaviour changed.
@@ -72,7 +72,7 @@ Check for updates**: it must name `v1.0.1` and offer the download page.
 ## Signing, and why an update may refuse to install
 
 The release build is currently signed with the **Android debug key** (see
-`README.md`, "Known limitations"). That is fine for testing and for the phone that
+`README.md`, "Known limits"). That is fine for testing and for the phone that
 first installs the app, but Android refuses to install an APK whose signature differs
 from the installed one, so:
 
